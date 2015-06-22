@@ -1,10 +1,9 @@
-package co.fusionx.relay.internal.protocol.core
+package co.fusionx.relay.internal.parser
 
 import co.fusionx.irc.message.CommandMessage
 import co.fusionx.irc.message.Message
 import co.fusionx.relay.*
 import co.fusionx.relay.internal.*
-import co.fusionx.relay.internal.protocol.EventParser
 import rx.Observable
 import rx.subjects.PublishSubject
 

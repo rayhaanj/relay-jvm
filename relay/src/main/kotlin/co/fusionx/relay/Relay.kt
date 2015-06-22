@@ -5,14 +5,14 @@ import co.fusionx.irc.plain.PlainParser
 import co.fusionx.irc.plain.PlainStringifier
 import co.fusionx.relay.internal.*
 import co.fusionx.relay.internal.event.CoreEventHandler
-import co.fusionx.relay.internal.protocol.DelegatingEventParser
+import co.fusionx.relay.internal.parser.DelegatingEventParser
 import co.fusionx.relay.internal.tcp.netty.NettyConnection
 import rx.Observable
 import rx.schedulers.Schedulers
 import rx.subjects.PublishSubject
 
 public class Relay private constructor(configuration: ConnectionConfiguration,
-                            userConfig: UserConfiguration) {
+                                       userConfig: UserConfiguration) {
 
     public val server: Server
 

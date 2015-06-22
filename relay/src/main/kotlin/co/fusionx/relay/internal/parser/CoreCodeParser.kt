@@ -1,16 +1,15 @@
-package co.fusionx.relay.internal.protocol.core
+package co.fusionx.relay.internal.parser
 
 import co.fusionx.irc.message.CodeMessage
 import co.fusionx.relay.*
 import co.fusionx.relay.internal.UserImpl
-import co.fusionx.relay.internal.protocol.EventParser
 import co.fusionx.relay.internal.protocol.LevelledNick
 import co.fusionx.relay.internal.protocol.ReplyCodes
 import rx.Observable
 
 class CoreCodeParser private constructor(private val eventStream: Observable<Event>,
                                          override val channelTracker: ChannelTracker,
-                                         override val userTracker: UserTracker) : EventParser<CodeMessage> {
+                                         override val userTracker: UserTracker) : EventParser<co.fusionx.irc.message.CodeMessage> {
 
     override fun parse(message: CodeMessage): Observable<Event> = when (message.code) {
         ReplyCodes.RPL_WELCOME -> onWelcome(message)

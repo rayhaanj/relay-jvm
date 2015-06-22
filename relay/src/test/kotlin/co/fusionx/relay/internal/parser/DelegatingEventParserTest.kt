@@ -1,4 +1,4 @@
-package co.fusionx.relay.internal.protocol
+package co.fusionx.relay.internal.parser
 
 import co.fusionx.irc.message.CodeMessage
 import co.fusionx.irc.message.CodeMessageData
@@ -6,8 +6,8 @@ import co.fusionx.irc.message.CommandMessage
 import co.fusionx.irc.message.CommandMessageData
 import co.fusionx.relay.Event
 import co.fusionx.relay.Session
-import co.fusionx.relay.internal.protocol.ext.CodeExtParser
-import co.fusionx.relay.internal.protocol.ext.CommandExtParser
+import co.fusionx.relay.internal.parser.ext.CodeExtParser
+import co.fusionx.relay.internal.parser.ext.CommandExtParser
 import co.fusionx.relay.uninitialized
 import org.mockito.Mockito.doReturn
 import org.mockito.Mockito.mock
@@ -29,12 +29,12 @@ public class DelegatingEventParserTest {
     private val extCommand = mock(javaClass<CommandExtParser>())
     private val extCode = mock(javaClass<CodeExtParser>())
 
-    before fun init() {
+    org.junit.Before fun init() {
         doReturn("test-capability").`when`(extCommand).capability
         doReturn("TESTCOMMAND").`when`(extCommand).command
     }
 
-    test fun testCodeMessageDelegates() {
+    org.junit.Test fun testCodeMessageDelegates() {
         val parser = DelegatingEventParser(session, coreCommand, coreCode, Observable.empty(), Observable.empty())
 
         val message = CodeMessageData(code = 100, target = "relay", arguments = randomArgs)
@@ -43,7 +43,7 @@ public class DelegatingEventParserTest {
         verify(coreCode).parse(message)
     }
 
-    test fun testCommandMessageDelegates() {
+    org.junit.Test fun testCommandMessageDelegates() {
         val parser = DelegatingEventParser(session, coreCommand, coreCode, Observable.empty(), Observable.empty())
 
         val message = CommandMessageData(command = "TESTCOMMAND", arguments = randomArgs)
@@ -52,7 +52,7 @@ public class DelegatingEventParserTest {
         verify(coreCommand).parse(message)
     }
 
-    test fun testExtensionCommandMessageDelegates() {
+    org.junit.Test fun testExtensionCommandMessageDelegates() {
         doReturn(setOf("test-capability")).`when`(session).capabilities
         doReturn(Observable.empty<Event>()).`when`(extCommand).parse(uninitialized())
 
@@ -65,7 +65,7 @@ public class DelegatingEventParserTest {
         verify(coreCommand, never()).parse(uninitialized())
     }
 
-    test fun testExtensionCommandMessageWithoutCapDelegatesToCore() {
+    org.junit.Test fun testExtensionCommandMessageWithoutCapDelegatesToCore() {
         val parser = DelegatingEventParser(session, coreCommand, coreCode, Observable.just(extCommand), Observable.empty())
 
         val message = CommandMessageData(command = "TESTCOMMAND", arguments = randomArgs)
@@ -75,7 +75,7 @@ public class DelegatingEventParserTest {
         verify(extCommand, never()).parse(uninitialized())
     }
 
-    test fun testNotExtensionCommandMessageDelegatesToCore() {
+    org.junit.Test fun testNotExtensionCommandMessageDelegatesToCore() {
         val parser = DelegatingEventParser(session, coreCommand, coreCode, Observable.just(extCommand), Observable.empty())
 
         val message = CommandMessageData(command = "ANOTHERCOMMAND", arguments = randomArgs)

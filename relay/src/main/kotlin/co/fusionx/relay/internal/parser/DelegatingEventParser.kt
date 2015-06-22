@@ -1,4 +1,4 @@
-package co.fusionx.relay.internal.protocol
+package co.fusionx.relay.internal.parser
 
 import co.fusionx.irc.message.CodeMessage
 import co.fusionx.irc.message.CommandMessage
@@ -7,11 +7,9 @@ import co.fusionx.relay.ChannelTracker
 import co.fusionx.relay.Event
 import co.fusionx.relay.Session
 import co.fusionx.relay.UserTracker
-import co.fusionx.relay.internal.protocol.core.CoreCodeParser
-import co.fusionx.relay.internal.protocol.core.CoreCommandParser
-import co.fusionx.relay.internal.protocol.ext.CodeExtParser
-import co.fusionx.relay.internal.protocol.ext.CommandExtParser
-import co.fusionx.relay.internal.protocol.ext.ExtensionParsers
+import co.fusionx.relay.internal.parser.ext.CodeExtParser
+import co.fusionx.relay.internal.parser.ext.CommandExtParser
+import co.fusionx.relay.internal.parser.ext.ExtensionParsers
 import rx.Observable
 import rx.subjects.PublishSubject
 

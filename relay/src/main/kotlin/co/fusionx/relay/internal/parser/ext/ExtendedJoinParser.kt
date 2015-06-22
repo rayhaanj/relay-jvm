@@ -1,4 +1,4 @@
-package co.fusionx.relay.internal.protocol.ext
+package co.fusionx.relay.internal.parser.ext
 
 import co.fusionx.irc.message.CommandMessage
 import co.fusionx.irc.message.Message
