@@ -1,0 +1,32 @@
+allprojects {
+    buildscript {
+        repositories {
+            jcenter()
+        }
+    }
+    repositories {
+        jcenter()
+        maven {
+            url "https://oss.sonatype.org/content/repositories/snapshots"
+        }
+    }
+}
+
+ext {
+    kotlinVersion = '0.13.1514'
+    kotlinPlugin = "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
+    kotlinStdlib = "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
+    kotlinReflect = "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
+
+    relay = ':relay'
+    relayAndroid = ':android'
+    relayAnnotations = ':annotations'
+    relayCompiler = ':compiler'
+
+    okio = 'com.squareup.okio:okio:1.6.0'
+    kovenant = 'nl.komponents.kovenant:kovenant:2.5.0'
+
+    junit = 'junit:junit:4.12'
+    assertj = 'org.assertj:assertj-core:2.2.0'
+    mockito = 'org.mockito:mockito-core:2.0.31-beta'
+}
