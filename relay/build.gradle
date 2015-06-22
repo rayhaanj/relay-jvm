@@ -19,3 +19,4 @@ dependencies {
     testCompile rootProject.ext.mockito
     testCompile rootProject.ext.truth
 }
+apply from: file('../gradle/gradle-mvn-push.gradle')
