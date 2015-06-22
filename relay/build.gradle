@@ -1,0 +1,21 @@
+buildscript {
+    dependencies {
+        classpath rootProject.ext.kotlinPlugin
+    }
+}
+
+apply plugin: 'kotlin'
+
+dependencies {
+    compile rootProject.ext.ircProtocol
+
+    compile rootProject.ext.kotlinStdlib
+    compile rootProject.ext.kotlinReflect
+
+    compile rootProject.ext.netty
+    compile rootProject.ext.rxJava
+
+    testCompile rootProject.ext.junit
+    testCompile rootProject.ext.mockito
+    testCompile rootProject.ext.truth
+}
