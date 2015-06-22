@@ -16,7 +16,7 @@ internal fun String.isChannel(): Boolean = CHANNEL_FIRST_CHARACTERS.contains(cha
 
 internal fun Capability.Companion.parse(cap: String): Capability {
     val split = cap.split('=')
-    return Capability(split.get(0), split.getOrNull(1))
+    return Capability(split[0], split.getOrNull(1))
 }
 
 internal fun CapType.Companion.parse(capString: String): CapType? =
@@ -24,4 +24,4 @@ internal fun CapType.Companion.parse(capString: String): CapType? =
         .filter { it.asString == capString }
         .firstOrNull()
 
-internal fun <E : Any> List<E>.getOrNull(index: Int): E? = if (size() < index) null else this[index]
+internal fun <E : Any> List<E>.getOrNull(index: Int): E? = if (index < size()) this[index] else null
