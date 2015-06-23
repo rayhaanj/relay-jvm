@@ -2,7 +2,7 @@ package co.fusionx.relay.internal
 
 import co.fusionx.relay.Event
 import co.fusionx.relay.User
-import com.google.common.truth.Truth.assertThat
+import org.assertj.core.api.Assertions.assertThat
 import org.mockito.Mockito.mock
 import rx.subjects.PublishSubject
 import org.junit.Test as test

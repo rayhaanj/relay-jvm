@@ -17,6 +17,6 @@ dependencies {
 
     testCompile rootProject.ext.junit
     testCompile rootProject.ext.mockito
-    testCompile rootProject.ext.truth
+    testCompile rootProject.ext.assertj
 }
 apply from: file('../gradle/gradle-mvn-push.gradle')
