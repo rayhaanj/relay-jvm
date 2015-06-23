@@ -17,6 +17,7 @@ public class DelegatingRxListTest {
 
         assertThat(subscriber.getOnNextEvents())
             .containsExactly(RxCollectionAddEvent("TestItem"))
+        assertThat(list.snapshot()).containsExactly("TestItem")
         subscriber.assertNoErrors()
     }
 
@@ -28,6 +29,7 @@ public class DelegatingRxListTest {
 
         assertThat(subscriber.getOnNextEvents())
             .containsExactly(RxCollectionUpdateEvent(0, "First"))
+        assertThat(list.snapshot()).containsExactly("First")
         subscriber.assertNoErrors()
     }
 
@@ -37,6 +39,7 @@ public class DelegatingRxListTest {
         list.remove("TestItem")
 
         assertThat(subscriber.getOnNextEvents()).isEmpty()
+        assertThat(list.snapshot()).isEmpty()
         subscriber.assertNoErrors()
     }
 
@@ -47,6 +50,7 @@ public class DelegatingRxListTest {
 
         assertThat(subscriber.getOnNextEvents())
             .containsExactly(RxCollectionRemoveEvent("TestItem"))
+        assertThat(list.snapshot()).isEmpty()
         subscriber.assertNoErrors()
     }
 
@@ -59,6 +63,7 @@ public class DelegatingRxListTest {
 
         assertThat(subscriber.getOnNextEvents())
             .containsExactly(RxCollectionAddAllEvent(testList))
+        assertThat(list.snapshot()).containsExactlyElementsOf(testList)
         subscriber.assertNoErrors()
     }
 
@@ -71,6 +76,7 @@ public class DelegatingRxListTest {
 
         assertThat(subscriber.getOnNextEvents())
             .containsExactly(RxCollectionRemoveAllEvent(testList))
+        assertThat(list.snapshot()).isEmpty()
         subscriber.assertNoErrors()
     }
 
@@ -83,6 +89,7 @@ public class DelegatingRxListTest {
 
         assertThat(subscriber.getOnNextEvents())
             .containsExactly(RxCollectionRemoveAllEvent(removeList))
+        assertThat(list.snapshot()).isEmpty()
         subscriber.assertNoErrors()
     }
 
@@ -93,6 +100,7 @@ public class DelegatingRxListTest {
         list.removeAll(removeList)
 
         assertThat(subscriber.getOnNextEvents()).isEmpty()
+        assertThat(list.snapshot()).isEmpty()
         subscriber.assertNoErrors()
     }
 
@@ -106,10 +114,8 @@ public class DelegatingRxListTest {
         list.retainAll(retainedList)
 
         assertThat(subscriber.getOnNextEvents())
-            .containsExactly(
-                RxCollectionClearEvent(),
-                RxCollectionAddAllEvent(retainedList)
-            )
+            .containsExactly(RxCollectionClearEvent(), RxCollectionAddAllEvent(retainedList))
+        assertThat(list.snapshot()).containsExactlyElementsOf(retainedList)
         subscriber.assertNoErrors()
     }
 }

@@ -1,11 +1,13 @@
 package co.fusionx.relay.rxcollection
 
 import rx.subjects.PublishSubject
+import java.util.ArrayList
 
 class DelegatingRxList<T> internal constructor(private val internal: MutableList<T>) : RxList<T>,
     MutableList<T> by internal {
-
     override val events = PublishSubject.create<RxCollectionStructureEvent<T>>()
+
+    override fun snapshot(): Collection<T> = ArrayList(internal)
 
     override fun add(e: T): Boolean {
         val result = internal.add(e)

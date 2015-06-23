@@ -22,7 +22,9 @@ public data class RxCollectionAddAllEvent<T>(val items: Collection<T>) : RxColle
 public data class RxCollectionRemoveAllEvent<T>(val items: Collection<T>) : RxCollectionStructureEvent<T>
 
 public interface RxCollection<T> : MutableCollection<T> {
-    val events: Observable<RxCollectionStructureEvent<T>>
+    public val events: Observable<RxCollectionStructureEvent<T>>
+
+    public fun snapshot(): Collection<T>
 }
 
 public interface RxList<T> : RxCollection<T>
