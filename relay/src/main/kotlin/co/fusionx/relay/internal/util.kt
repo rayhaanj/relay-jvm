@@ -1,6 +1,5 @@
 package co.fusionx.relay.internal
 
-import co.fusionx.irc.util.getOrNull
 import co.fusionx.relay.CapType
 import co.fusionx.relay.Capability
 import co.fusionx.relay.UserLevel

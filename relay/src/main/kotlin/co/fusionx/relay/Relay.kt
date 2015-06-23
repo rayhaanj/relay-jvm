@@ -15,17 +15,12 @@ public class Relay private constructor(configuration: ConnectionConfiguration,
                                        userConfig: UserConfiguration) {
 
     public val server: Server
-
     public val session: Session
-
     public val channelTracker: ChannelTracker
 
     private val connection: Connection
-
     private val userTracker: UserTracker
-
     private val queryTracker: QueryTracker
-
     private val eventParser: DelegatingEventParser
 
     companion object {

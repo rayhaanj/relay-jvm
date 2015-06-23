@@ -25,12 +25,12 @@ public object Configurations {
     }
 }
 
-class ConnectionConfigurationBuilder internal constructor() : ConnectionConfiguration {
+public class ConnectionConfigurationBuilder internal constructor() : ConnectionConfiguration {
     override var hostname: String = ""
     override var port: Int = -1
 }
 
-class UserConfigurationBuilder internal constructor() : UserConfiguration {
+public class UserConfigurationBuilder internal constructor() : UserConfiguration {
     override var nick: String = ""
     override var username: String = ""
     override var realName: String = ""
