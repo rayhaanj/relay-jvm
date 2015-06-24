@@ -41,10 +41,6 @@ internal class CoreCommandParser private constructor(private val eventStream: Ob
         return Observable.just(CapEvent(subCommand, caps))
     }
 
-    private fun onPrivmsg(message: CommandMessage): Observable<Event> = onMessage(message)
-
-    private fun onNotice(message: CommandMessage): Observable<Event> = onMessage(message)
-
     private fun onJoin(message: CommandMessage): Observable<Event> {
         /* Parse the arguments */
         val nick = message.prefix?.serverNameOrNick ?: return prefixMissing()
@@ -111,6 +107,10 @@ internal class CoreCommandParser private constructor(private val eventStream: Ob
 
         return Observable.just(PartEvent(channel, user, reason))
     }
+
+    private fun onPrivmsg(message: CommandMessage): Observable<Event> = onMessage(message)
+
+    private fun onNotice(message: CommandMessage): Observable<Event> = onMessage(message)
 
     private fun onMessage(message: CommandMessage): Observable<Event> {
         /* Parse the arguments */

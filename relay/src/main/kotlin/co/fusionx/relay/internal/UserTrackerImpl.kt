@@ -4,9 +4,9 @@ import co.fusionx.relay.*
 import rx.Observable
 
 internal class UserTrackerImpl(override val self: User,
-                               private val eventStream: Observable<Event>,
-                               private val userNickMap: MutableMap<String, User>,
-                               private val selfNick: String) : UserTracker {
+    private val eventStream: Observable<Event>,
+    private val userNickMap: MutableMap<String, User>,
+    private val selfNick: String) : UserTracker {
 
     init {
         userNickMap[selfNick] = self
@@ -17,7 +17,7 @@ internal class UserTrackerImpl(override val self: User,
             /* concatMap here even though we'll only get one nick user pair for each user */
             .concatMap { it.user.nick.first().map { n -> Pair(n, it.user) } }
             /* Add the pair to the map in a thread safe way */
-            .subscribe { pair -> synchronized(userNickMap) { userNickMap[pair.first] = pair.second } }
+            .subscribe { pair -> userNickMap[pair.first] = pair.second }
 
         eventStream.ofType(javaClass<NickEvent>())
             .subscribe {
@@ -27,5 +27,5 @@ internal class UserTrackerImpl(override val self: User,
             }
     }
 
-    override internal fun user(nick: String): User? = synchronized(userNickMap) { userNickMap[nick] }
+    override internal fun user(nick: String): User? = userNickMap[nick]
 }

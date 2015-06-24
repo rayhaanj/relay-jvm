@@ -3,16 +3,12 @@ package co.fusionx.relay.internal
 import co.fusionx.relay.*
 import rx.Observable
 import rx.subjects.BehaviorSubject
-import java.util.HashSet
 
 internal class UserImpl(initialNick: String,
-                        eventStream: Observable<Event>) : User {
+    eventStream: Observable<Event>) : User {
 
-    override val nick: Observable<String>
-    override val channels: Set<Channel>
-        get() = synchronized(channelSet) { HashSet(channelSet) }
-
-    private val channelSet: MutableSet<Channel> = hashSetOf()
+    public override val nick: Observable<String>
+    internal override val channels: MutableSet<Channel> = hashSetOf()
 
     init {
         val behaviourNick = BehaviorSubject.create(initialNick)
@@ -25,15 +21,15 @@ internal class UserImpl(initialNick: String,
 
         eventStream.ofType(javaClass<JoinEvent>())
             .filter { it.user == this }
-            .subscribe { synchronized(channelSet) { channelSet.add(it.channel) } }
+            .subscribe { channels.add(it.channel) }
 
         eventStream.ofType(javaClass<PartEvent>())
             .filter { it.user == this }
-            .subscribe { synchronized(channelSet) { channelSet.remove(it.channel) } }
+            .subscribe { channels.remove(it.channel) }
 
         eventStream.ofType(javaClass<QuitEvent>())
             .filter { it.user == this }
-            .subscribe { synchronized(channelSet) { channelSet.clear() } }
+            .subscribe { channels.clear() }
     }
 
     override fun toString(): String = "DefaultUser(nick=${nick.toBlocking().first()})"

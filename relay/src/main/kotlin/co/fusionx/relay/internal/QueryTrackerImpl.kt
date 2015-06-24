@@ -7,5 +7,5 @@ public class QueryTrackerImpl : QueryTracker {
 
     private val queryMap: MutableMap<String, Query> = hashMapOf()
 
-    override internal fun query(nick: String): Query? = synchronized(queryMap) { queryMap[nick] }
+    override internal fun query(nick: String): Query? = queryMap[nick]
 }

@@ -1,10 +1,6 @@
 package co.fusionx.relay
 
-import rx.Observable
-
 public interface ChannelTracker {
-    public val channels: Observable<Channel>
-
     internal fun channel(channelName: String): Channel?
 }
 

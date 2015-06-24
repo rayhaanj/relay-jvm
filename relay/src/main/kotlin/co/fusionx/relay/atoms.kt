@@ -23,7 +23,7 @@ public enum class Status {
  */
 public interface User {
     public val nick: Observable<String>
-    public val channels: Set<Channel>
+    internal val channels: Set<Channel>
 }
 
 private interface EventProducer<T> {
@@ -35,7 +35,7 @@ private interface EventProducer<T> {
  */
 public interface Session : EventProducer<Event> {
     public val status: Observable<Status>
-    public val capabilities: Set<Capability>
+    internal val capabilities: Set<Capability>
 
     public fun join(channelName: String)
 }
