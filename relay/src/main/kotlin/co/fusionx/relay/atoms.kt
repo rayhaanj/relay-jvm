@@ -26,7 +26,7 @@ public interface User {
     internal val channels: Set<Channel>
 }
 
-private interface EventProducer<T> {
+public interface EventProducer<T> {
     public val eventStream: Observable<T>
 }
 
