@@ -50,7 +50,6 @@ public interface Server : EventProducer<ServerEvent>
  */
 public interface Channel : EventProducer<ChannelEvent> {
     public val name: String
-    public val users: Set<User>
 
     public fun privmsg(message: String)
 }
