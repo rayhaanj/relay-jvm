@@ -1,5 +1,6 @@
-package co.fusionx.relay.rxcollection
+package co.fusionx.relay.rx.collection
 
+import co.fusionx.relay.rx.collection.*
 import rx.subjects.PublishSubject
 import java.util.ArrayList
 

@@ -1,5 +1,6 @@
-package co.fusionx.relay.rxcollection
+package co.fusionx.relay.rx
 
+import co.fusionx.relay.rx.collection.*
 import org.assertj.core.api.Assertions.assertThat
 import rx.observers.TestSubscriber
 import org.junit.Test as test
