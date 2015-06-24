@@ -4,6 +4,7 @@ import co.fusionx.irc.message.CommandMessage
 import co.fusionx.irc.message.Message
 import co.fusionx.relay.*
 import co.fusionx.relay.internal.*
+import co.fusionx.relay.internal.protocol.Commands
 import rx.Observable
 import rx.subjects.PublishSubject
 
@@ -13,14 +14,14 @@ internal class CoreCommandParser private constructor(private val eventStream: Ob
     override val userTracker: UserTracker) : EventParser<CommandMessage> {
 
     override fun parse(message: CommandMessage): Observable<Event> = when (message.command) {
-        "JOIN" -> onJoin(message)
-        "NICK" -> onNick(message)
-        "PRIVMSG" -> onPrivmsg(message)
-        "NOTICE" -> onNotice(message)
-        "CAP" -> onCap(message)
-        "PING" -> onPing(message)
-        "PART" -> onPart(message)
-        "QUIT" -> onQuit(message)
+        Commands.JOIN -> onJoin(message)
+        Commands.NICK -> onNick(message)
+        Commands.PRIVMSG -> onPrivmsg(message)
+        Commands.NOTICE -> onNotice(message)
+        Commands.CAP -> onCap(message)
+        Commands.PING -> onPing(message)
+        Commands.PART -> onPart(message)
+        Commands.QUIT -> onQuit(message)
         else -> Observable.empty()
     }
 
