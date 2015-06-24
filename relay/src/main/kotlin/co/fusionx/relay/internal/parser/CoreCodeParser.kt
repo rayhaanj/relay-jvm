@@ -5,11 +5,12 @@ import co.fusionx.relay.*
 import co.fusionx.relay.internal.UserImpl
 import co.fusionx.relay.internal.protocol.LevelledNick
 import co.fusionx.relay.internal.protocol.ReplyCodes
+import co.fusionx.relay.rx.filterNotNull
 import rx.Observable
 
 class CoreCodeParser private constructor(private val eventStream: Observable<Event>,
-                                         override val channelTracker: ChannelTracker,
-                                         override val userTracker: UserTracker) : EventParser<co.fusionx.irc.message.CodeMessage> {
+    override val channelTracker: ChannelTracker,
+    override val userTracker: UserTracker) : EventParser<co.fusionx.irc.message.CodeMessage> {
 
     override fun parse(message: CodeMessage): Observable<Event> = when (message.code) {
         ReplyCodes.RPL_WELCOME -> onWelcome(message)
@@ -19,7 +20,7 @@ class CoreCodeParser private constructor(private val eventStream: Observable<Eve
     }
 
     fun onWelcome(message: CodeMessage): Observable<Event> {
-        val text = message.arguments[0]
+        val (text) = message.arguments
 
         /* We concatMap here even though we are actually guaranteed to get back only one value */
         return userTracker.self.nick.first()
@@ -38,18 +39,18 @@ class CoreCodeParser private constructor(private val eventStream: Observable<Eve
 
     fun onNames(message: CodeMessage): Observable<Event> {
         /* Parse the arguments */
-        val channelName = message.arguments[1]
-        val nicks = message.arguments[2]
+        val (_, channelName, nicks) = message.arguments
+        val nickList = nicks.split(' ')
 
         /* TODO - maybe return an error here? */
         val channel = channelTracker.channel(channelName) ?: return Observable.empty()
 
         /* For a names reply */
-        return Observable.from(nicks.split(' '))
-            .concatMap {
-                val levelledNick = LevelledNick.parse(it)
-                if (levelledNick == null) Observable.empty() else Observable.just(levelledNick)
-            }
+        return Observable.from(nickList)
+            /* Get the levelled nick out */
+            .map { LevelledNick.parse(it) }
+            /* Filter out the nulls */
+            .filterNotNull()
             /* ...we need to convert each of the nicks in the names to a user or create one... */
             .map { LevelledUser(it.level, userTracker.user(it.nick) ?: UserImpl(it.nick, eventStream)) }
             /* ...collect them up... */
@@ -60,7 +61,7 @@ class CoreCodeParser private constructor(private val eventStream: Observable<Eve
 
     companion object {
         fun create(eventStream: Observable<Event>,
-                   channelTracker: ChannelTracker,
-                   userTracker: UserTracker): CoreCodeParser = CoreCodeParser(eventStream, channelTracker, userTracker)
+            channelTracker: ChannelTracker,
+            userTracker: UserTracker): CoreCodeParser = CoreCodeParser(eventStream, channelTracker, userTracker)
     }
 }
