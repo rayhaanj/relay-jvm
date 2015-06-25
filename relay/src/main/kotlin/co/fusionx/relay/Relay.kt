@@ -12,7 +12,7 @@ import rx.schedulers.Schedulers
 import rx.subjects.PublishSubject
 
 public class Relay private constructor(configuration: ConnectionConfiguration,
-                                       userConfig: UserConfiguration) {
+    userConfig: UserConfiguration) {
 
     public val server: Server
     public val session: Session
@@ -25,7 +25,7 @@ public class Relay private constructor(configuration: ConnectionConfiguration,
 
     companion object {
         public fun create(configuration: ConnectionConfiguration,
-                          userConfig: UserConfiguration): Relay {
+            userConfig: UserConfiguration): Relay {
             return Relay(configuration, userConfig)
         }
     }
@@ -34,7 +34,6 @@ public class Relay private constructor(configuration: ConnectionConfiguration,
         /* These two and the event stream are our main flow of data in the system */
         val outputStream = PublishSubject.create<Message>()
         val rawOutputStream = generateRawOutputStream(outputStream)
-        rawOutputStream.subscribe { println(it) }
 
         connection = NettyConnection.create(configuration, rawOutputStream)
 
@@ -60,7 +59,7 @@ public class Relay private constructor(configuration: ConnectionConfiguration,
     }
 
     private fun generateEventStream(rawInputStream: Observable<String>,
-                                    statusStream: Observable<Status>): Observable<Event> {
+        statusStream: Observable<Status>): Observable<Event> {
         /* Create the message generator */
         val stringMessageConverter = PlainParser.create()
 
