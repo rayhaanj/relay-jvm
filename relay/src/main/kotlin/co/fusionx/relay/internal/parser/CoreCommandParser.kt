@@ -48,19 +48,16 @@ internal class CoreCommandParser private constructor(private val eventStream: Ob
 
         /* Get the user and the channel */
         val user = userTracker.user(nick) ?: UserImpl(nick, eventStream)
-        val trackerChannel = channelTracker.channel(channelName)
+        var channel = channelTracker.channel(channelName)
 
-        val channel: Channel
         if (user == userTracker.self) {
-            /* This is us - we need to create a new channel for sure if we are getting this */
-            /* TODO - assert that channel is not in channelTracker */
-            channel = ChannelImpl(channelName, eventStream, outputStream)
-        } else if (trackerChannel == null) {
             /* TODO - return an error here */
-            return Observable.empty()
-        } else {
-            channel = trackerChannel
-        }
+            if (channel != null) return Observable.empty()
+
+            /* This is us - we need to create a new channel for sure if we are getting this */
+            channel = ChannelImpl(channelName, eventStream, outputStream)
+        } else if (channel == null) return channelMissing()
+
         return Observable.just(JoinEvent(channel, user))
     }
 
