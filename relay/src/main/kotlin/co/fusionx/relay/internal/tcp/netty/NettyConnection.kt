@@ -15,9 +15,9 @@ import rx.Observable
 import rx.subjects.PublishSubject
 
 public class NettyConnection private constructor(override val input: PublishSubject<String>,
-                                      private val rawOutput: Observable<String>,
-                                      override val status: PublishSubject<Status>,
-                                      val connectConfig: ConnectionConfiguration) : Connection {
+                                                 private val rawOutput: Observable<String>,
+                                                 override val status: PublishSubject<Status>,
+                                                 val connectConfig: ConnectionConfiguration) : Connection {
 
     val clientBuilder = Bootstrap()
         .group(NioEventLoopGroup())

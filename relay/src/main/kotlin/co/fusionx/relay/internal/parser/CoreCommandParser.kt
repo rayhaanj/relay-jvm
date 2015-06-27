@@ -9,9 +9,9 @@ import rx.Observable
 import rx.subjects.PublishSubject
 
 internal class CoreCommandParser private constructor(private val eventStream: Observable<Event>,
-    private val outputStream: PublishSubject<Message>,
-    override val channelTracker: ChannelTracker,
-    override val userTracker: UserTracker) : EventParser<CommandMessage> {
+                                                     private val outputStream: PublishSubject<Message>,
+                                                     override val channelTracker: ChannelTracker,
+                                                     override val userTracker: UserTracker) : EventParser<CommandMessage> {
 
     override fun parse(message: CommandMessage): Observable<Event> = when (message.command) {
         Commands.JOIN -> onJoin(message)
@@ -133,9 +133,9 @@ internal class CoreCommandParser private constructor(private val eventStream: Ob
 
     companion object {
         fun create(eventStream: Observable<Event>,
-            outputStream: PublishSubject<Message>,
-            channelTracker: ChannelTracker,
-            userTracker: UserTracker): CoreCommandParser =
+                   outputStream: PublishSubject<Message>,
+                   channelTracker: ChannelTracker,
+                   userTracker: UserTracker): CoreCommandParser =
             CoreCommandParser(eventStream, outputStream, channelTracker, userTracker)
     }
 }

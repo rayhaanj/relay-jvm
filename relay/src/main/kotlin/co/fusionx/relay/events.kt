@@ -95,7 +95,7 @@ data class ChannelQuitEvent(override val channel: Channel,
 
 
 /* Used specially inside Names (and eventually WHOIS) */
-data class LevelledUser (val levels: List<UserLevel>, val user: User)
+data class LevelledUser(val levels: List<UserLevel>, val user: User)
 
 /**
  * TODO

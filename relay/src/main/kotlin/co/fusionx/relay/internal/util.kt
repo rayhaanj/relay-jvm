@@ -3,7 +3,6 @@ package co.fusionx.relay.internal
 import co.fusionx.relay.CapType
 import co.fusionx.relay.Capability
 import co.fusionx.relay.UserLevel
-import rx.Observable
 
 private val CHANNEL_FIRST_CHARACTERS = setOf('&', '#', '+', '!')
 

@@ -7,8 +7,8 @@ import rx.Observable
 import rx.subjects.PublishSubject
 
 class ChannelImpl(override val name: String,
-    rawEventStream: Observable<Event>,
-    val outputStream: PublishSubject<Message>) : Channel {
+                  rawEventStream: Observable<Event>,
+                  val outputStream: PublishSubject<Message>) : Channel {
 
     override val eventStream: Observable<ChannelEvent>
 

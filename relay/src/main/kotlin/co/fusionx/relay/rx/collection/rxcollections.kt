@@ -1,6 +1,5 @@
 package co.fusionx.relay.rx.collection
 
-import co.fusionx.relay.rx.collection.DelegatingRxList
 import rx.Observable
 import rx.functions.Func0
 

@@ -9,7 +9,7 @@ import rx.subjects.PublishSubject
 import java.util.HashSet
 
 public class SessionImpl(override val eventStream: Observable<Event>,
-    val outputStream: PublishSubject<Message>) : Session {
+                         val outputStream: PublishSubject<Message>) : Session {
 
     override val status: BehaviorSubject<Status> = BehaviorSubject.create(Status.DISCONNECTED)
     override internal val capabilities: MutableSet<Capability> = HashSet()

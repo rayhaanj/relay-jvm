@@ -9,9 +9,9 @@ import rx.Observable
 import rx.subjects.PublishSubject
 
 class ExtendedJoinParser(private val eventStream: Observable<Event>,
-    private val outputStream: PublishSubject<Message>,
-    override val channelTracker: ChannelTracker,
-    override val userTracker: UserTracker) : CommandExtParser {
+                         private val outputStream: PublishSubject<Message>,
+                         override val channelTracker: ChannelTracker,
+                         override val userTracker: UserTracker) : CommandExtParser {
 
     override val capability: String = "extended-join"
     override val command: String = "JOIN"

@@ -9,8 +9,8 @@ import co.fusionx.relay.rx.filterNotNull
 import rx.Observable
 
 class CoreCodeParser private constructor(private val eventStream: Observable<Event>,
-    override val channelTracker: ChannelTracker,
-    override val userTracker: UserTracker) : EventParser<co.fusionx.irc.message.CodeMessage> {
+                                         override val channelTracker: ChannelTracker,
+                                         override val userTracker: UserTracker) : EventParser<co.fusionx.irc.message.CodeMessage> {
 
     override fun parse(message: CodeMessage): Observable<Event> = when (message.code) {
         ReplyCodes.RPL_WELCOME -> onWelcome(message)
@@ -61,7 +61,7 @@ class CoreCodeParser private constructor(private val eventStream: Observable<Eve
 
     companion object {
         fun create(eventStream: Observable<Event>,
-            channelTracker: ChannelTracker,
-            userTracker: UserTracker): CoreCodeParser = CoreCodeParser(eventStream, channelTracker, userTracker)
+                   channelTracker: ChannelTracker,
+                   userTracker: UserTracker): CoreCodeParser = CoreCodeParser(eventStream, channelTracker, userTracker)
     }
 }

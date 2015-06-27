@@ -4,9 +4,9 @@ import co.fusionx.relay.*
 import rx.Observable
 
 internal class UserTrackerImpl(override val self: User,
-    private val eventStream: Observable<Event>,
-    private val userNickMap: MutableMap<String, User>,
-    private val selfNick: String) : UserTracker {
+                               private val eventStream: Observable<Event>,
+                               private val userNickMap: MutableMap<String, User>,
+                               private val selfNick: String) : UserTracker {
 
     init {
         userNickMap[selfNick] = self

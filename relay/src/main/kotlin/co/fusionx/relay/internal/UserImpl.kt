@@ -5,7 +5,7 @@ import rx.Observable
 import rx.subjects.BehaviorSubject
 
 internal class UserImpl(initialNick: String,
-    eventStream: Observable<Event>) : User {
+                        eventStream: Observable<Event>) : User {
 
     public override val nick: Observable<String>
     internal override val channels: MutableSet<Channel> = hashSetOf()
