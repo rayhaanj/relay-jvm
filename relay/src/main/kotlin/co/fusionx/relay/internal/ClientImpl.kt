@@ -4,8 +4,8 @@ import co.fusionx.irc.message.Message
 import co.fusionx.irc.plain.PlainParser
 import co.fusionx.irc.plain.PlainStringifier
 import co.fusionx.relay.*
-import co.fusionx.relay.internal.connection.SturdyConnection
-import co.fusionx.relay.internal.connection.ThreadedSturdyConnection
+import co.fusionx.relay.internal.sturdy.SturdyConnection
+import co.fusionx.relay.internal.sturdy.ThreadedSturdyConnection
 import co.fusionx.relay.internal.event.CoreEventHandler
 import co.fusionx.relay.internal.network.NetworkConnection
 import co.fusionx.relay.internal.network.TCPSocketConnection
@@ -33,13 +33,12 @@ public class ClientImpl(private val connectionConfiguration: ConnectionConfigura
 
     init {
         /* These two and the event stream are our main flow of data in the system */
-        val outputSubject = PublishSubject.create<Message>()
-        val rawOutputObservable = generateRawOutputSink(outputSubject)
+        val messageSink = PublishSubject.create<Message>()
 
-        networkConnection = TCPSocketConnection.create(connectionConfiguration, rawOutputObservable)
+        networkConnection = TCPSocketConnection.create(connectionConfiguration, generateRawSink(messageSink))
         sturdyConnection = ThreadedSturdyConnection.create(networkConnection)
 
-        val eventSource = generateEventObservable(networkConnection.rawSource, networkConnection.rawStatusSource)
+        val eventSource = generateEventSource(networkConnection.rawSource, networkConnection.rawStatusSource)
 
         /* Generate the stateful objects */
         /* TODO - figure out if this is the best way to do this */
@@ -49,22 +48,22 @@ public class ClientImpl(private val connectionConfiguration: ConnectionConfigura
         channelTracker = ChannelTrackerImpl(eventSource)
         queryTracker = QueryTrackerImpl()
         userTracker = UserTrackerImpl(initialUser, eventSource, hashMapOf(), initialNick)
-        session = SessionImpl(eventSource, outputSubject)
-        server = ServerImpl(eventSource, outputSubject)
+        session = SessionImpl(eventSource, messageSink)
+        server = ServerImpl(eventSource, messageSink)
 
         /* Initialize the message -> event converter */
-        eventParser = DelegatingEventParser.create(session, eventSource, outputSubject, channelTracker, userTracker)
+        eventParser = DelegatingEventParser.create(session, eventSource, messageSink, channelTracker, userTracker)
 
         /* Generate the core handler and make it start observing */
         val coreHandler = CoreEventHandler(userConfiguration, session)
-        coreHandler.handle(eventSource, outputSubject)
+        coreHandler.handle(eventSource, messageSink)
 
         /* Start the actual connection */
         sturdyConnection.start()
     }
 
-    private fun generateEventObservable(rawSource: Observable<String>,
-                                        rawStatusSource: Observable<Status>): Observable<Event> {
+    private fun generateEventSource(rawSource: Observable<String>,
+                                    rawStatusSource: Observable<Status>): Observable<Event> {
         /* Create the message generator */
         val stringMessageConverter = PlainParser.create()
 
@@ -81,7 +80,7 @@ public class ClientImpl(private val connectionConfiguration: ConnectionConfigura
         return Observable.merge(statusEvents, inputEvents).share()
     }
 
-    private fun generateRawOutputSink(outputSink: PublishSubject<Message>): Observable<String> {
+    private fun generateRawSink(outputSink: PublishSubject<Message>): Observable<String> {
         val messageRawConverter = PlainStringifier.create()
         return outputSink.map { messageRawConverter.convert(it) }
     }

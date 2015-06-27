@@ -1,4 +1,4 @@
-package co.fusionx.relay.internal.connection
+package co.fusionx.relay.internal.sturdy
 
 import co.fusionx.relay.internal.network.NetworkConnection
 
