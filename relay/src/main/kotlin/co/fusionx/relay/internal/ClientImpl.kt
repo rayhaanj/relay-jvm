@@ -4,14 +4,16 @@ import co.fusionx.irc.message.Message
 import co.fusionx.irc.plain.PlainParser
 import co.fusionx.irc.plain.PlainStringifier
 import co.fusionx.relay.*
-import co.fusionx.relay.internal.sturdy.SturdyConnection
-import co.fusionx.relay.internal.sturdy.ThreadedSturdyConnection
 import co.fusionx.relay.internal.event.CoreEventHandler
 import co.fusionx.relay.internal.network.NetworkConnection
 import co.fusionx.relay.internal.network.TCPSocketConnection
 import co.fusionx.relay.internal.parser.DelegatingEventParser
+import co.fusionx.relay.internal.sturdy.SturdyConnection
+import co.fusionx.relay.internal.sturdy.ThreadedSturdyConnection
 import rx.Observable
+import rx.schedulers.Schedulers
 import rx.subjects.PublishSubject
+import java.util.concurrent.Executors
 
 public class ClientImpl(private val connectionConfiguration: ConnectionConfiguration,
                         private val userConfiguration: UserConfiguration) : Client {
@@ -35,16 +37,24 @@ public class ClientImpl(private val connectionConfiguration: ConnectionConfigura
         /* These two and the event stream are our main flow of data in the system */
         val messageSink = PublishSubject.create<Message>()
 
+        /* Generate the connections */
         networkConnection = TCPSocketConnection.create(connectionConfiguration, generateRawSink(messageSink))
         sturdyConnection = ThreadedSturdyConnection.create(networkConnection)
 
-        val eventSource = generateEventSource(networkConnection.rawSource, networkConnection.rawStatusSource)
+        /* Explicitly cross thread boundary here for the source observables */
+        val sourceScheduler = Schedulers.from(Executors.newSingleThreadExecutor())
+        val rawSource = networkConnection.rawSource.observeOn(sourceScheduler)
+        val rawStatusSource = networkConnection.rawStatusSource.observeOn(sourceScheduler)
+
+        /* Get the final event source */
+        val eventSource = generateEventSource(rawSource, rawStatusSource)
 
         /* Generate the stateful objects */
         /* TODO - figure out if this is the best way to do this */
         val initialNick = "*"
         val initialUser = UserImpl(initialNick, eventSource)
 
+        /* Generate the stateful objects */
         channelTracker = ChannelTrackerImpl(eventSource)
         queryTracker = QueryTrackerImpl()
         userTracker = UserTrackerImpl(initialUser, eventSource, hashMapOf(), initialNick)
