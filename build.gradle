@@ -20,7 +20,7 @@ ext {
     ircProtocol = 'co.fusionx.irc:irc-protocol-jvm:0.1.5-SNAPSHOT'
 
     rxJava = 'io.reactivex:rxjava:1.0.12'
-    netty = 'io.netty:netty-all:4.0.28.Final'
+    okio = 'com.squareup.okio:okio:1.4.0'
 
     junit = 'junit:junit:4.12'
     assertj = 'org.assertj:assertj-core:3.0.0'

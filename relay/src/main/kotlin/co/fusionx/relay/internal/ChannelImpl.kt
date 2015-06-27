@@ -7,8 +7,8 @@ import rx.Observable
 import rx.subjects.PublishSubject
 
 class ChannelImpl(override val name: String,
-                  raweventSource: Observable<Event>,
-                  val outputStream: PublishSubject<Message>) : Channel {
+                  globalEventSource: Observable<Event>,
+                  val outputSink: PublishSubject<Message>) : Channel {
 
     override val eventSource: Observable<ChannelEvent>
 
@@ -16,7 +16,7 @@ class ChannelImpl(override val name: String,
 
     init {
         /* Generate our channel specific event stream */
-        eventSource = raweventSource.ofType(javaClass<ChannelEvent>())
+        eventSource = globalEventSource.ofType(javaClass<ChannelEvent>())
             .filter { it.channel == this }
             .share()
 
@@ -34,5 +34,5 @@ class ChannelImpl(override val name: String,
 
     /* Methods to send messages to the server */
     override fun privmsg(message: String) =
-        outputStream.onNext(ClientMessageGenerator.privmsg(name, message))
+        outputSink.onNext(ClientMessageGenerator.privmsg(name, message))
 }

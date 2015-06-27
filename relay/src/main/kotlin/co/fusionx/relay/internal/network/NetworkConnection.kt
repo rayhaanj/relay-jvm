@@ -6,7 +6,7 @@ import rx.Observable
 public interface NetworkConnection {
     val rawSource: Observable<String>
     val rawStatusSource: Observable<Status>
+    val invalid: Boolean
 
     fun connect()
-    fun disconnect()
 }

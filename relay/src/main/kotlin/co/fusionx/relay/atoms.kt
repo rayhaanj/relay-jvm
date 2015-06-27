@@ -14,20 +14,17 @@ public enum class UserLevel private constructor(val char: String) {
 
 public enum class Status {
     DISCONNECTED,
-    SOCKET_CONNECTED,
-    CONNECTED
+    CONNECTED,
+    REGISTERED
 }
 
 /**
- * Represents an IRC user
+ * An entry-point which aggregates different IRC subsystems into one unified interface.
  */
-public interface User {
-    public val nick: Observable<String>
-    internal val channels: Set<Channel>
-}
-
-public interface EventProducer<T> {
-    public val eventSource: Observable<T>
+public interface Client {
+    public val server: Server
+    public val session: Session
+    public val channelTracker: ChannelTracker
 }
 
 /**
@@ -58,3 +55,15 @@ public interface Channel : EventProducer<ChannelEvent> {
  * Represents an IRC query
  */
 public interface Query
+
+/**
+ * Represents an IRC user
+ */
+public interface User {
+    public val nick: Observable<String>
+    internal val channels: Set<Channel>
+}
+
+public interface EventProducer<T> {
+    public val eventSource: Observable<T>
+}

@@ -12,8 +12,8 @@ dependencies {
     compile rootProject.ext.kotlinStdlib
     compile rootProject.ext.kotlinReflect
 
-    compile rootProject.ext.netty
     compile rootProject.ext.rxJava
+    compile rootProject.ext.okio
 
     testCompile rootProject.ext.junit
     testCompile rootProject.ext.mockito

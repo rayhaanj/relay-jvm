@@ -8,7 +8,7 @@ import rx.Observable
 import rx.subjects.PublishSubject
 
 public class ServerImpl(raweventSource: Observable<Event>,
-                        private val outputStream: PublishSubject<Message>) : Server {
+                        private val outputSink: PublishSubject<Message>) : Server {
 
     override val eventSource: Observable<ServerEvent>
 

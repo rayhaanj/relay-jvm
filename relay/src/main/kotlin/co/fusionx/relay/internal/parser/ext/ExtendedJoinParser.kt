@@ -8,13 +8,14 @@ import co.fusionx.relay.internal.UserImpl
 import rx.Observable
 import rx.subjects.PublishSubject
 
-class ExtendedJoinParser(private val eventSource: Observable<Event>,
-                         private val outputStream: PublishSubject<Message>,
+class ExtendedJoinParser(private val session: Session,
+                         private val eventSource: Observable<Event>,
+                         private val outputSink: PublishSubject<Message>,
                          override val channelTracker: ChannelTracker,
                          override val userTracker: UserTracker) : CommandExtParser {
 
-    override val capability: String = "extended-join"
-    override val command: String = "JOIN"
+    private val capability: String = "extended-join"
+    private val command: String = "JOIN"
 
     override fun parse(message: CommandMessage): Observable<Event> {
         /* TODO - return an error here */
@@ -33,7 +34,7 @@ class ExtendedJoinParser(private val eventSource: Observable<Event>,
         if (user == userTracker.self) {
             /* This is us - we need to create a new channel for sure if we are getting this */
             /* TODO - assert that channel is not in channelTracker */
-            channel = ChannelImpl(channelName, eventSource, outputStream)
+            channel = ChannelImpl(channelName, eventSource, outputSink)
         } else if (trackerChannel == null) {
             /* TODO - return an error here */
             return Observable.empty()
@@ -41,5 +42,9 @@ class ExtendedJoinParser(private val eventSource: Observable<Event>,
             channel = trackerChannel
         }
         return Observable.just(JoinEvent(channel, user))
+    }
+
+    override fun canParse(message: CommandMessage): Boolean {
+        return message.command == command && session.capabilities.contains(capability)
     }
 }

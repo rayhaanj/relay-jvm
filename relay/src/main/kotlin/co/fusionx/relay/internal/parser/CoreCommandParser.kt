@@ -9,7 +9,7 @@ import rx.Observable
 import rx.subjects.PublishSubject
 
 internal class CoreCommandParser private constructor(private val eventSource: Observable<Event>,
-                                                     private val outputStream: PublishSubject<Message>,
+                                                     private val outputSink: PublishSubject<Message>,
                                                      override val channelTracker: ChannelTracker,
                                                      override val userTracker: UserTracker) : EventParser<CommandMessage> {
 
@@ -55,7 +55,7 @@ internal class CoreCommandParser private constructor(private val eventSource: Ob
             if (channel != null) return Observable.empty()
 
             /* This is us - we need to create a new channel for sure if we are getting this */
-            channel = ChannelImpl(channelName, eventSource, outputStream)
+            channel = ChannelImpl(channelName, eventSource, outputSink)
         } else if (channel == null) return channelMissing()
 
         return Observable.just(JoinEvent(channel, user))
@@ -133,9 +133,9 @@ internal class CoreCommandParser private constructor(private val eventSource: Ob
 
     companion object {
         fun create(eventSource: Observable<Event>,
-                   outputStream: PublishSubject<Message>,
+                   outputSink: PublishSubject<Message>,
                    channelTracker: ChannelTracker,
                    userTracker: UserTracker): CoreCommandParser =
-            CoreCommandParser(eventSource, outputStream, channelTracker, userTracker)
+            CoreCommandParser(eventSource, outputSink, channelTracker, userTracker)
     }
 }

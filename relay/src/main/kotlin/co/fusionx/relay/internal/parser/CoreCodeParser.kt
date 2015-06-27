@@ -28,7 +28,7 @@ class CoreCodeParser private constructor(private val eventSource: Observable<Eve
                 Observable.just(
                     NickEvent(userTracker.self, it, message.target),
                     ServerGenericCodeEvent(message.code, text),
-                    StatusEvent(Status.CONNECTED)
+                    StatusEvent(Status.REGISTERED)
                 )
             }
     }

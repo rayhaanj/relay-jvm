@@ -27,14 +27,14 @@ class DelegatingEventParser(private val session: Session,
 
     private fun parseCommand(message: CommandMessage): Observable<Event> = extCommandParsers
         /* Get an extension parser which might be able to parse the message */
-        .filter { it.command == message.command && session.capabilities.contains(it.capability) }
+        .filter { it.canParse(message) }
         .map<EventParser<CommandMessage>> { it }
         .firstOrDefault(coreCommandParser)
         .concatMap { it.parse(message) }
 
     private fun parseCode(message: CodeMessage): Observable<Event> = extCodeParsers
         /* Get an extension parser which might be able to parse the message */
-        .filter { it.code == message.code && session.capabilities.contains(it.capability) }
+        .filter { it.canParse(message) }
         .map<EventParser<CodeMessage>> { it }
         .firstOrDefault(coreCodeParser)
         .concatMap { it.parse(message) }
@@ -47,7 +47,7 @@ class DelegatingEventParser(private val session: Session,
                    users: UserTracker): DelegatingEventParser {
             val command = CoreCommandParser.create(events, output, channels, users)
             val code = CoreCodeParser.create(events, channels, users)
-            val extCommands = ExtensionParsers.commandParsers(events, output, channels, users)
+            val extCommands = ExtensionParsers.commandParsers(session, events, output, channels, users)
             val extCodes = ExtensionParsers.codeParsers()
 
             return DelegatingEventParser(session, command, code, extCommands, extCodes)

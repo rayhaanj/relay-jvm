@@ -9,7 +9,7 @@ import rx.subjects.PublishSubject
 import java.util.HashSet
 
 public class SessionImpl(override val eventSource: Observable<Event>,
-                         val outputStream: PublishSubject<Message>) : Session {
+                         val outputSink: PublishSubject<Message>) : Session {
 
     override val status: BehaviorSubject<Status> = BehaviorSubject.create(Status.DISCONNECTED)
     override internal val capabilities: MutableSet<Capability> = HashSet()
@@ -26,5 +26,5 @@ public class SessionImpl(override val eventSource: Observable<Event>,
     }
 
     override fun join(channelName: String) =
-        outputStream.onNext(ClientMessageGenerator.join(channelName))
+        outputSink.onNext(ClientMessageGenerator.join(channelName))
 }

@@ -9,15 +9,15 @@ import rx.subjects.PublishSubject
 public class CoreEventHandler(private val userConfig: UserConfiguration, private val session: Session) {
 
     public fun handle(eventSource: Observable<Event>,
-                      outputStream: PublishSubject<Message>) {
+                      outputSink: PublishSubject<Message>) {
         /* Auto respond to pings with pongs */
         eventSource.ofType(javaClass<PingEvent>())
             .map { ClientMessageGenerator.pong(it.server) }
-            .subscribe { outputStream.onNext(it) }
+            .subscribe { outputSink.onNext(it) }
 
         /* Messages sent on initial connection */
         eventSource.ofType(javaClass<StatusEvent>())
-            .filter { it.status == Status.SOCKET_CONNECTED }
+            .filter { it.status == Status.CONNECTED }
             .concatMap {
                 /* Send CAP LS, USER and NICK */
                 Observable.just(
@@ -26,12 +26,12 @@ public class CoreEventHandler(private val userConfig: UserConfiguration, private
                     ClientMessageGenerator.nick(userConfig.nick)
                 )
             }
-            .subscribe { outputStream.onNext(it) }
+            .subscribe { outputSink.onNext(it) }
 
-        handleCap(eventSource, outputStream)
+        handleCap(eventSource, outputSink)
     }
 
-    private fun handleCap(eventSource: Observable<Event>, outputStream: PublishSubject<Message>) {
+    private fun handleCap(eventSource: Observable<Event>, outputSink: PublishSubject<Message>) {
         /* Create the cap stream */
         val capStream = eventSource.ofType(javaClass<CapEvent>()).share()
 
@@ -39,7 +39,7 @@ public class CoreEventHandler(private val userConfig: UserConfiguration, private
         capStream.filter { it.capType == CapType.LS }
             /* only pass through the event if we are in the middle of registration */
             .withLatestFrom(session.status) { x, y -> Pair(x, y) }
-            .filter { it.second == Status.SOCKET_CONNECTED }
+            .filter { it.second == Status.CONNECTED }
             .map { it.first }
             /* map the caps to strings */
             .map { it.capabilities.map { it.toString() } }
@@ -49,26 +49,26 @@ public class CoreEventHandler(private val userConfig: UserConfiguration, private
             .map { ClientMessageGenerator.cap(CapType.REQ.asString, it) }
             /* send a CAP END message if there is no CAPs we can request */
             .defaultIfEmpty(ClientMessageGenerator.cap(CapType.END.asString))
-            .subscribe { outputStream.onNext(it) }
+            .subscribe { outputSink.onNext(it) }
 
         /* If we have a NAK then */
         capStream.filter { it.capType == CapType.NAK }
             /* only pass through the event if we are in the middle of registration */
             .withLatestFrom(session.status) { x, y -> Pair(x, y) }
-            .filter { it.second == Status.SOCKET_CONNECTED }
+            .filter { it.second == Status.CONNECTED }
             .map { it.first }
             /* send a CAP END message */
             .map { ClientMessageGenerator.cap(CapType.END.asString) }
-            .subscribe { outputStream.onNext(it) }
+            .subscribe { outputSink.onNext(it) }
 
         /* If we have a ACK then */
         capStream.filter { it.capType == CapType.ACK }
             /* only pass through the event if we are in the middle of registration */
             .withLatestFrom(session.status) { x, y -> Pair(x, y) }
-            .filter { it.second == Status.SOCKET_CONNECTED }
+            .filter { it.second == Status.CONNECTED }
             .map { it.first }
             /* send a CAP END message */
             .map { ClientMessageGenerator.cap(CapType.END.asString) }
-            .subscribe { outputStream.onNext(it) }
+            .subscribe { outputSink.onNext(it) }
     }
 }

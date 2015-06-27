@@ -7,30 +7,27 @@ import rx.subjects.BehaviorSubject
 internal class UserImpl(initialNick: String,
                         eventSource: Observable<Event>) : User {
 
-    public override val nick: Observable<String>
-    internal override val channels: MutableSet<Channel> = hashSetOf()
+    override val nick: BehaviorSubject<String> = BehaviorSubject.create(initialNick)
+    override val channels: MutableSet<Channel> = hashSetOf()
 
     init {
-        val behaviourNick = BehaviorSubject.create(initialNick)
-        nick = behaviourNick
-
-        eventSource.ofType(javaClass<NickEvent>())
+        val localEventSource = eventSource.ofType(javaClass<UserEvent>())
             .filter { it.user == this }
+            .share()
+
+        localEventSource.ofType(javaClass<NickEvent>())
             .map { it.newNick }
-            .subscribe { behaviourNick.onNext(it) }
+            .subscribe { nick.onNext(it) }
 
-        eventSource.ofType(javaClass<JoinEvent>())
-            .filter { it.user == this }
+        localEventSource.ofType(javaClass<JoinEvent>())
             .subscribe { channels.add(it.channel) }
 
-        eventSource.ofType(javaClass<PartEvent>())
-            .filter { it.user == this }
+        localEventSource.ofType(javaClass<PartEvent>())
             .subscribe { channels.remove(it.channel) }
 
-        eventSource.ofType(javaClass<QuitEvent>())
-            .filter { it.user == this }
+        localEventSource.ofType(javaClass<QuitEvent>())
             .subscribe { channels.clear() }
     }
 
-    override fun toString(): String = "DefaultUser(nick=${nick.toBlocking().first()})"
+    override fun toString(): String = "UserImpl(nick=${nick.toBlocking().first()})"
 }
