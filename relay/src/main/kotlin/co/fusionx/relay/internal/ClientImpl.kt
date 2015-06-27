@@ -43,8 +43,8 @@ public class ClientImpl(private val connectionConfiguration: ConnectionConfigura
 
         /* Explicitly cross thread boundary here for the source observables */
         val sourceScheduler = Schedulers.from(Executors.newSingleThreadExecutor())
-        val rawSource = networkConnection.rawSource.observeOn(sourceScheduler)
-        val rawStatusSource = networkConnection.rawStatusSource.observeOn(sourceScheduler)
+        val rawSource = networkConnection.rawSource.onBackpressureBuffer().observeOn(sourceScheduler)
+        val rawStatusSource = networkConnection.rawStatusSource.onBackpressureBuffer().observeOn(sourceScheduler)
 
         /* Get the final event source */
         val eventSource = generateEventSource(rawSource, rawStatusSource)
