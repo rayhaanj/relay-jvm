@@ -8,7 +8,7 @@ import co.fusionx.relay.internal.protocol.Commands
 import rx.Observable
 import rx.subjects.PublishSubject
 
-internal class CoreCommandParser private constructor(private val eventStream: Observable<Event>,
+internal class CoreCommandParser private constructor(private val eventSource: Observable<Event>,
                                                      private val outputStream: PublishSubject<Message>,
                                                      override val channelTracker: ChannelTracker,
                                                      override val userTracker: UserTracker) : EventParser<CommandMessage> {
@@ -47,7 +47,7 @@ internal class CoreCommandParser private constructor(private val eventStream: Ob
         val (channelName) = message.arguments
 
         /* Get the user and the channel */
-        val user = userTracker.user(nick) ?: UserImpl(nick, eventStream)
+        val user = userTracker.user(nick) ?: UserImpl(nick, eventSource)
         var channel = channelTracker.channel(channelName)
 
         if (user == userTracker.self) {
@@ -55,7 +55,7 @@ internal class CoreCommandParser private constructor(private val eventStream: Ob
             if (channel != null) return Observable.empty()
 
             /* This is us - we need to create a new channel for sure if we are getting this */
-            channel = ChannelImpl(channelName, eventStream, outputStream)
+            channel = ChannelImpl(channelName, eventSource, outputStream)
         } else if (channel == null) return channelMissing()
 
         return Observable.just(JoinEvent(channel, user))
@@ -132,10 +132,10 @@ internal class CoreCommandParser private constructor(private val eventStream: Ob
     private fun userMissing(): Observable<Event> = Observable.empty()
 
     companion object {
-        fun create(eventStream: Observable<Event>,
+        fun create(eventSource: Observable<Event>,
                    outputStream: PublishSubject<Message>,
                    channelTracker: ChannelTracker,
                    userTracker: UserTracker): CoreCommandParser =
-            CoreCommandParser(eventStream, outputStream, channelTracker, userTracker)
+            CoreCommandParser(eventSource, outputStream, channelTracker, userTracker)
     }
 }

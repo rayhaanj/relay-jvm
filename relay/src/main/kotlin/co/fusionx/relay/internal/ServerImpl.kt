@@ -7,12 +7,12 @@ import co.fusionx.relay.ServerEvent
 import rx.Observable
 import rx.subjects.PublishSubject
 
-public class ServerImpl(rawEventStream: Observable<Event>,
+public class ServerImpl(raweventSource: Observable<Event>,
                         private val outputStream: PublishSubject<Message>) : Server {
 
-    override val eventStream: Observable<ServerEvent>
+    override val eventSource: Observable<ServerEvent>
 
     init {
-        eventStream = rawEventStream.ofType(javaClass<ServerEvent>()).share()
+        eventSource = raweventSource.ofType(javaClass<ServerEvent>()).share()
     }
 }

@@ -8,7 +8,7 @@ import co.fusionx.relay.internal.UserImpl
 import rx.Observable
 import rx.subjects.PublishSubject
 
-class ExtendedJoinParser(private val eventStream: Observable<Event>,
+class ExtendedJoinParser(private val eventSource: Observable<Event>,
                          private val outputStream: PublishSubject<Message>,
                          override val channelTracker: ChannelTracker,
                          override val userTracker: UserTracker) : CommandExtParser {
@@ -21,7 +21,7 @@ class ExtendedJoinParser(private val eventStream: Observable<Event>,
         val prefix = message.prefix ?: return Observable.empty()
 
         val nick = prefix.serverNameOrNick
-        val user = userTracker.user(nick) ?: UserImpl(nick, eventStream)
+        val user = userTracker.user(nick) ?: UserImpl(nick, eventSource)
 
         /* Parse the arguments */
         val (channelName, accountName, realName) = message.arguments
@@ -33,7 +33,7 @@ class ExtendedJoinParser(private val eventStream: Observable<Event>,
         if (user == userTracker.self) {
             /* This is us - we need to create a new channel for sure if we are getting this */
             /* TODO - assert that channel is not in channelTracker */
-            channel = ChannelImpl(channelName, eventStream, outputStream)
+            channel = ChannelImpl(channelName, eventSource, outputStream)
         } else if (trackerChannel == null) {
             /* TODO - return an error here */
             return Observable.empty()

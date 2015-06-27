@@ -8,15 +8,15 @@ import rx.subjects.PublishSubject
 
 public class CoreEventHandler(private val userConfig: UserConfiguration, private val session: Session) {
 
-    public fun handle(eventStream: Observable<Event>,
+    public fun handle(eventSource: Observable<Event>,
                       outputStream: PublishSubject<Message>) {
         /* Auto respond to pings with pongs */
-        eventStream.ofType(javaClass<PingEvent>())
+        eventSource.ofType(javaClass<PingEvent>())
             .map { ClientMessageGenerator.pong(it.server) }
             .subscribe { outputStream.onNext(it) }
 
         /* Messages sent on initial connection */
-        eventStream.ofType(javaClass<StatusEvent>())
+        eventSource.ofType(javaClass<StatusEvent>())
             .filter { it.status == Status.SOCKET_CONNECTED }
             .concatMap {
                 /* Send CAP LS, USER and NICK */
@@ -28,12 +28,12 @@ public class CoreEventHandler(private val userConfig: UserConfiguration, private
             }
             .subscribe { outputStream.onNext(it) }
 
-        handleCap(eventStream, outputStream)
+        handleCap(eventSource, outputStream)
     }
 
-    private fun handleCap(eventStream: Observable<Event>, outputStream: PublishSubject<Message>) {
+    private fun handleCap(eventSource: Observable<Event>, outputStream: PublishSubject<Message>) {
         /* Create the cap stream */
-        val capStream = eventStream.ofType(javaClass<CapEvent>()).share()
+        val capStream = eventSource.ofType(javaClass<CapEvent>()).share()
 
         /* If we have a LS then */
         capStream.filter { it.capType == CapType.LS }

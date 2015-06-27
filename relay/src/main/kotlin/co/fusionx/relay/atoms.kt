@@ -27,7 +27,7 @@ public interface User {
 }
 
 public interface EventProducer<T> {
-    public val eventStream: Observable<T>
+    public val eventSource: Observable<T>
 }
 
 /**

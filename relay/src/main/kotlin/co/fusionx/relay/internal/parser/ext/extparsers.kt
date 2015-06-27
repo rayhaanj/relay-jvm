@@ -21,14 +21,14 @@ interface CodeExtParser : EventParser<CodeMessage> {
 }
 
 public object ExtensionParsers {
-    public fun commandParsers(eventStream: Observable<Event>,
+    public fun commandParsers(eventSource: Observable<Event>,
                               outputStream: PublishSubject<Message>,
                               channelTracker: ChannelTracker,
                               userTracker: UserTracker): Observable<CommandExtParser> = Observable.defer {
         Observable.just(
-            AccountNotifyParser(eventStream, outputStream, channelTracker, userTracker),
-            AwayNotifyParser(eventStream, outputStream, channelTracker, userTracker),
-            ExtendedJoinParser(eventStream, outputStream, channelTracker, userTracker)
+            AccountNotifyParser(eventSource, outputStream, channelTracker, userTracker),
+            AwayNotifyParser(eventSource, outputStream, channelTracker, userTracker),
+            ExtendedJoinParser(eventSource, outputStream, channelTracker, userTracker)
         )
     }
 

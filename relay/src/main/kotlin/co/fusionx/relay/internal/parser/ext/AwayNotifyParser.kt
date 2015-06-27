@@ -9,7 +9,7 @@ import co.fusionx.relay.internal.getOrNull
 import rx.Observable
 import rx.subjects.PublishSubject
 
-class AwayNotifyParser(private val eventStream: Observable<Event>,
+class AwayNotifyParser(private val eventSource: Observable<Event>,
                        private val outputStream: PublishSubject<Message>,
                        override val channelTracker: ChannelTracker,
                        override val userTracker: UserTracker) : CommandExtParser {

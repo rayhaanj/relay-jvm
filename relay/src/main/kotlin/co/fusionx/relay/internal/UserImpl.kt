@@ -5,7 +5,7 @@ import rx.Observable
 import rx.subjects.BehaviorSubject
 
 internal class UserImpl(initialNick: String,
-                        eventStream: Observable<Event>) : User {
+                        eventSource: Observable<Event>) : User {
 
     public override val nick: Observable<String>
     internal override val channels: MutableSet<Channel> = hashSetOf()
@@ -14,20 +14,20 @@ internal class UserImpl(initialNick: String,
         val behaviourNick = BehaviorSubject.create(initialNick)
         nick = behaviourNick
 
-        eventStream.ofType(javaClass<NickEvent>())
+        eventSource.ofType(javaClass<NickEvent>())
             .filter { it.user == this }
             .map { it.newNick }
             .subscribe { behaviourNick.onNext(it) }
 
-        eventStream.ofType(javaClass<JoinEvent>())
+        eventSource.ofType(javaClass<JoinEvent>())
             .filter { it.user == this }
             .subscribe { channels.add(it.channel) }
 
-        eventStream.ofType(javaClass<PartEvent>())
+        eventSource.ofType(javaClass<PartEvent>())
             .filter { it.user == this }
             .subscribe { channels.remove(it.channel) }
 
-        eventStream.ofType(javaClass<QuitEvent>())
+        eventSource.ofType(javaClass<QuitEvent>())
             .filter { it.user == this }
             .subscribe { channels.clear() }
     }

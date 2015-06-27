@@ -8,7 +8,7 @@ import co.fusionx.relay.internal.protocol.ReplyCodes
 import co.fusionx.relay.rx.filterNotNull
 import rx.Observable
 
-class CoreCodeParser private constructor(private val eventStream: Observable<Event>,
+class CoreCodeParser private constructor(private val eventSource: Observable<Event>,
                                          override val channelTracker: ChannelTracker,
                                          override val userTracker: UserTracker) : EventParser<co.fusionx.irc.message.CodeMessage> {
 
@@ -52,7 +52,7 @@ class CoreCodeParser private constructor(private val eventStream: Observable<Eve
             /* Filter out the nulls */
             .filterNotNull()
             /* ...we need to convert each of the nicks in the names to a user or create one... */
-            .map { LevelledUser(it.level, userTracker.user(it.nick) ?: UserImpl(it.nick, eventStream)) }
+            .map { LevelledUser(it.level, userTracker.user(it.nick) ?: UserImpl(it.nick, eventSource)) }
             /* ...collect them up... */
             .toList()
             /* ...and emit an event. */
@@ -60,8 +60,8 @@ class CoreCodeParser private constructor(private val eventStream: Observable<Eve
     }
 
     companion object {
-        fun create(eventStream: Observable<Event>,
+        fun create(eventSource: Observable<Event>,
                    channelTracker: ChannelTracker,
-                   userTracker: UserTracker): CoreCodeParser = CoreCodeParser(eventStream, channelTracker, userTracker)
+                   userTracker: UserTracker): CoreCodeParser = CoreCodeParser(eventSource, channelTracker, userTracker)
     }
 }

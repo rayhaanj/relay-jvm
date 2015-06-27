@@ -5,8 +5,9 @@ import co.fusionx.irc.plain.PlainParser
 import co.fusionx.irc.plain.PlainStringifier
 import co.fusionx.relay.internal.*
 import co.fusionx.relay.internal.event.CoreEventHandler
+import co.fusionx.relay.internal.network.NetworkConnection
+import co.fusionx.relay.internal.network.TCPNettyConnection
 import co.fusionx.relay.internal.parser.DelegatingEventParser
-import co.fusionx.relay.internal.tcp.netty.NettyConnection
 import rx.Observable
 import rx.schedulers.Schedulers
 import rx.subjects.PublishSubject
@@ -18,7 +19,7 @@ public class Relay private constructor(configuration: ConnectionConfiguration,
     public val session: Session
     public val channelTracker: ChannelTracker
 
-    private val connection: Connection
+    private val networkConnection: NetworkConnection
     private val userTracker: UserTracker
     private val queryTracker: QueryTracker
     private val eventParser: DelegatingEventParser
@@ -32,48 +33,48 @@ public class Relay private constructor(configuration: ConnectionConfiguration,
 
     init {
         /* These two and the event stream are our main flow of data in the system */
-        val outputStream = PublishSubject.create<Message>()
-        val rawOutputStream = generateRawOutputStream(outputStream)
+        val outputSubject = PublishSubject.create<Message>()
+        val rawOutputObservable = generateRawOutputStream(outputSubject)
 
-        connection = NettyConnection.create(configuration, rawOutputStream)
+        networkConnection = TCPNettyConnection.create(configuration, rawOutputObservable)
 
-        val eventStream = generateEventStream(connection.input, connection.status)
+        val eventObservable = generateEventObservable(networkConnection.rawSource, networkConnection.rawStatusSource)
 
         /* Generate the stateful objects */
         /* TODO - figure out if this is the best way to do this */
         val initialNick = "*"
-        val initialUser = UserImpl("*", eventStream)
+        val initialUser = UserImpl("*", eventObservable)
 
-        channelTracker = ChannelTrackerImpl(eventStream)
+        channelTracker = ChannelTrackerImpl(eventObservable)
         queryTracker = QueryTrackerImpl()
-        userTracker = UserTrackerImpl(initialUser, eventStream, hashMapOf(), initialNick)
-        session = SessionImpl(eventStream, outputStream)
-        server = ServerImpl(eventStream, outputStream)
+        userTracker = UserTrackerImpl(initialUser, eventObservable, hashMapOf(), initialNick)
+        session = SessionImpl(eventObservable, outputSubject)
+        server = ServerImpl(eventObservable, outputSubject)
 
         /* Initialize the message -> event converter */
-        eventParser = DelegatingEventParser.create(session, eventStream, outputStream, channelTracker, userTracker)
+        eventParser = DelegatingEventParser.create(session, eventObservable, outputSubject, channelTracker, userTracker)
 
         /* Generate the core handler and make it start observing */
         val coreHandler = CoreEventHandler(userConfig, session)
-        coreHandler.handle(eventStream, outputStream)
+        coreHandler.handle(eventObservable, outputSubject)
     }
 
-    private fun generateEventStream(rawInputStream: Observable<String>,
-                                    statusStream: Observable<Status>): Observable<Event> {
+    private fun generateEventObservable(rawSource: Observable<String>,
+                                        rawStatusSource: Observable<Status>): Observable<Event> {
         /* Create the message generator */
         val stringMessageConverter = PlainParser.create()
 
         /* Convert each string to a message */
-        val inputMessageStream = rawInputStream.asObservable().map { stringMessageConverter.parse(it) }
+        val inputMessages = rawSource.map { stringMessageConverter.parse(it) }
 
         /* Convert each message to one or more events */
-        val inputEventStream = inputMessageStream.concatMap { eventParser.parse(it) }
+        val inputEvents = inputMessages.concatMap { eventParser.parse(it) }
 
         /* Make up the status stream by wrapping statuses as events */
-        val statusEventStream = statusStream.map { StatusEvent(it) }
+        val statusEvents = rawStatusSource.map { StatusEvent(it) }
 
         /* This is our final stream that we use everywhere else in the system */
-        return Observable.merge(statusEventStream, inputEventStream).share()
+        return Observable.merge(statusEvents, inputEvents).share()
     }
 
     private fun generateRawOutputStream(outputStream: PublishSubject<Message>): Observable<String> {
@@ -82,18 +83,12 @@ public class Relay private constructor(configuration: ConnectionConfiguration,
     }
 
     public fun connect() {
-        connection.connect()
+        networkConnection.connect()
             .subscribeOn(Schedulers.newThread())
             .subscribe()
     }
 
     private fun close() {
-        /*
-        val closed = closed.getAndSet(true)
-        if (!closed) {
-            /* TODO - do this properly */
-            connection.disconnect()
-        }
-        */
+
     }
 }

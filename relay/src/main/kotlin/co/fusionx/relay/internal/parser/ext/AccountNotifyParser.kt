@@ -8,7 +8,7 @@ import co.fusionx.relay.UserTracker
 import rx.Observable
 import rx.subjects.PublishSubject
 
-class AccountNotifyParser(private val eventStream: Observable<Event>,
+class AccountNotifyParser(private val eventSource: Observable<Event>,
                           private val outputStream: PublishSubject<Message>,
                           override val channelTracker: ChannelTracker,
                           override val userTracker: UserTracker) : CommandExtParser {

@@ -7,25 +7,25 @@ import rx.Observable
 import rx.subjects.PublishSubject
 
 class ChannelImpl(override val name: String,
-                  rawEventStream: Observable<Event>,
+                  raweventSource: Observable<Event>,
                   val outputStream: PublishSubject<Message>) : Channel {
 
-    override val eventStream: Observable<ChannelEvent>
+    override val eventSource: Observable<ChannelEvent>
 
     private val userMap: MutableMap<User, List<UserLevel>> = hashMapOf()
 
     init {
         /* Generate our channel specific event stream */
-        eventStream = rawEventStream.ofType(javaClass<ChannelEvent>())
+        eventSource = raweventSource.ofType(javaClass<ChannelEvent>())
             .filter { it.channel == this }
             .share()
 
         /* Setup subscription for new users joining the channel */
-        eventStream.ofType(javaClass<JoinEvent>())
+        eventSource.ofType(javaClass<JoinEvent>())
             .subscribe { userMap[it.user] = listOf() }
 
         /* Setup subscription for the upcoming names event */
-        eventStream.ofType(javaClass<ChannelNamesReplyEvent>())
+        eventSource.ofType(javaClass<ChannelNamesReplyEvent>())
             .concatMap { Observable.from(it.levelledUsers) }
             .subscribe { userMap[it.user] = it.levels }
     }

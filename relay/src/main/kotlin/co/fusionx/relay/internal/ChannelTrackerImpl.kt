@@ -7,12 +7,12 @@ import co.fusionx.relay.JoinEvent
 import rx.Observable
 import java.util.HashMap
 
-internal class ChannelTrackerImpl(val eventStream: Observable<Event>) : ChannelTracker {
+internal class ChannelTrackerImpl(val eventSource: Observable<Event>) : ChannelTracker {
 
     private val channelMap: MutableMap<String, Channel> = HashMap()
 
     init {
-        eventStream.ofType(javaClass<JoinEvent>())
+        eventSource.ofType(javaClass<JoinEvent>())
             .subscribe { channelMap[it.channel.name] = it.channel }
     }
 
