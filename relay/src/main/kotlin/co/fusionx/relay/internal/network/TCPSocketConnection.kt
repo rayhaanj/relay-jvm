@@ -4,7 +4,6 @@ import co.fusionx.relay.ConnectionConfiguration
 import co.fusionx.relay.Status
 import okio.Okio
 import rx.Observable
-import rx.Subscription
 import rx.subjects.PublishSubject
 import java.io.IOException
 import java.net.InetSocketAddress
@@ -23,9 +22,6 @@ public class TCPSocketConnection private constructor(override val rawSource: Pub
     /* Stores whether this connected is invalid */
     private val atomicInvalid = AtomicBoolean(false)
 
-    /* Subscription to the sink */
-    private var sinkSubscription: Subscription? = null
-
     /* Public value of whether this connection is invalid or not */
     override val invalid: Boolean
         get() = atomicInvalid.get()
@@ -39,15 +35,19 @@ public class TCPSocketConnection private constructor(override val rawSource: Pub
             return
         }
 
-        /* Report the status */
-        rawStatusSource.onNext(Status.CONNECTED)
-
         /* Create the sink and source */
         val sink = Okio.buffer(Okio.sink(socket))
         val source = Okio.buffer(Okio.source(socket))
 
         /* Create a link between output stream and connection */
-        sinkSubscription = rawSink.subscribe { sink.writeUtf8(it) }
+        val sinkSubscription = rawSink.subscribe {
+            /* Write the bytes and flush them */
+            sink.writeUtf8(it + "\r\n")
+            sink.flush()
+        }
+
+        /* Report the status */
+        rawStatusSource.onNext(Status.CONNECTED)
 
         /* Start the source reading loop */
         var line = source.readUtf8Line()
@@ -55,6 +55,9 @@ public class TCPSocketConnection private constructor(override val rawSource: Pub
             rawSource.onNext(line)
             line = source.readUtf8Line()
         }
+
+        /* Unsubscribe from the sink */
+        sinkSubscription.unsubscribe()
 
         /* Invalidate this connection */
         atomicInvalid.set(true)
