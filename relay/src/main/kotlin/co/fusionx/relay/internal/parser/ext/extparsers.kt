@@ -27,8 +27,8 @@ public object ExtensionParsers {
                               userTracker: UserTracker): Observable<CommandExtParser> = Observable.defer {
         Observable.just(
             AccountNotifyParser(session, channelTracker, userTracker),
-            AwayNotifyParser(eventSource, outputSink, channelTracker, userTracker),
-            ExtendedJoinParser(eventSource, outputSink, channelTracker, userTracker)
+            AwayNotifyParser(session, eventSource, outputSink, channelTracker, userTracker),
+            ExtendedJoinParser(session, eventSource, outputSink, channelTracker, userTracker)
         )
     }
 

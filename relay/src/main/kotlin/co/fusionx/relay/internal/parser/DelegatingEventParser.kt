@@ -13,8 +13,7 @@ import co.fusionx.relay.internal.parser.ext.ExtensionParsers
 import rx.Observable
 import rx.subjects.PublishSubject
 
-class DelegatingEventParser(private val session: Session,
-                            private val coreCommandParser: EventParser<CommandMessage>,
+class DelegatingEventParser(private val coreCommandParser: EventParser<CommandMessage>,
                             private val coreCodeParser: EventParser<CodeMessage>,
                             private val extCommandParsers: Observable<CommandExtParser>,
                             private val extCodeParsers: Observable<CodeExtParser>) {
@@ -50,7 +49,7 @@ class DelegatingEventParser(private val session: Session,
             val extCommands = ExtensionParsers.commandParsers(session, events, output, channels, users)
             val extCodes = ExtensionParsers.codeParsers()
 
-            return DelegatingEventParser(session, command, code, extCommands, extCodes)
+            return DelegatingEventParser(command, code, extCommands, extCodes)
         }
     }
 }
