@@ -58,7 +58,7 @@ public object DefaultAtomCreationHooks : AtomCreationHooks {
         onChannel(ChannelImpl(channelName, eventSource, messageSink))
 
     override fun query(eventSource: Observable<Event>, messageSink: PublishSubject<Message>): Query =
-        onQuery(object : Query)
+        onQuery(object : Query {})
 
     override fun user(initialNick: String, eventSource: Observable<Event>): User =
         onUser(UserImpl(initialNick, eventSource))
