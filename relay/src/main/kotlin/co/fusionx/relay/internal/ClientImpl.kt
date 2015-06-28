@@ -15,7 +15,8 @@ import rx.schedulers.Schedulers
 import rx.subjects.PublishSubject
 import java.util.concurrent.Executors
 
-public class ClientImpl(private val connectionConfiguration: ConnectionConfiguration,
+public class ClientImpl(private val hooks: Hooks,
+                        private val connectionConfiguration: ConnectionConfiguration,
                         private val userConfiguration: UserConfiguration) : Client {
 
     public override val server: Server
@@ -29,8 +30,9 @@ public class ClientImpl(private val connectionConfiguration: ConnectionConfigura
     private val eventParser: DelegatingEventParser
 
     companion object {
-        fun start(connectionConfig: ConnectionConfiguration, userConfig: UserConfiguration): Client =
-            ClientImpl(connectionConfig, userConfig)
+        fun start(hooks: Hooks,
+                  connectionConfig: ConnectionConfiguration,
+                  userConfig: UserConfiguration): Client = ClientImpl(hooks, connectionConfig, userConfig)
     }
 
     init {
@@ -52,17 +54,18 @@ public class ClientImpl(private val connectionConfiguration: ConnectionConfigura
         /* Generate the stateful objects */
         /* TODO - figure out if this is the best way to do this */
         val initialNick = "*"
-        val initialUser = UserImpl(initialNick, eventSource)
+        val initialUser = hooks.atomCreation.user(initialNick, eventSource)
 
         /* Generate the stateful objects */
         channelTracker = ChannelTrackerImpl(eventSource)
         queryTracker = QueryTrackerImpl()
         userTracker = UserTrackerImpl(initialUser, eventSource, hashMapOf(), initialNick)
-        session = SessionImpl(eventSource, messageSink)
-        server = ServerImpl(eventSource, messageSink)
+        session = hooks.atomCreation.session(eventSource, messageSink)
+        server = hooks.atomCreation.server(eventSource, messageSink)
 
         /* Initialize the message -> event converter */
-        eventParser = DelegatingEventParser.create(session, eventSource, messageSink, channelTracker, userTracker)
+        eventParser = DelegatingEventParser.create(hooks.atomCreation, session, eventSource, messageSink,
+            channelTracker, userTracker)
 
         /* Generate the core handler and make it start observing */
         val coreHandler = CoreEventHandler(userConfiguration, session)

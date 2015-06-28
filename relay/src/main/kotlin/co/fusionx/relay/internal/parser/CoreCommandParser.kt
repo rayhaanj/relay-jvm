@@ -3,15 +3,21 @@ package co.fusionx.relay.internal.parser
 import co.fusionx.irc.message.CommandMessage
 import co.fusionx.irc.message.Message
 import co.fusionx.relay.*
-import co.fusionx.relay.internal.*
+import co.fusionx.relay.internal.UserImpl
+import co.fusionx.relay.internal.getOrNull
+import co.fusionx.relay.internal.isChannel
+import co.fusionx.relay.internal.parse
 import co.fusionx.relay.internal.protocol.Commands
 import rx.Observable
 import rx.subjects.PublishSubject
 
-internal class CoreCommandParser private constructor(private val eventSource: Observable<Event>,
-                                                     private val outputSink: PublishSubject<Message>,
-                                                     override val channelTracker: ChannelTracker,
-                                                     override val userTracker: UserTracker) : EventParser<CommandMessage> {
+internal class CoreCommandParser private constructor(
+    private val creationHooks: AtomCreationHooks,
+    private val eventSource: Observable<Event>,
+    private val outputSink: PublishSubject<Message>,
+    override val channelTracker: ChannelTracker,
+    override val userTracker: UserTracker
+) : EventParser<CommandMessage> {
 
     override fun parse(message: CommandMessage): Observable<Event> = when (message.command) {
         Commands.JOIN -> onJoin(message)
@@ -47,7 +53,7 @@ internal class CoreCommandParser private constructor(private val eventSource: Ob
         val (channelName) = message.arguments
 
         /* Get the user and the channel */
-        val user = userTracker.user(nick) ?: UserImpl(nick, eventSource)
+        val user = userTracker.user(nick) ?: creationHooks.user(nick, eventSource)
         var channel = channelTracker.channel(channelName)
 
         if (user == userTracker.self) {
@@ -55,7 +61,7 @@ internal class CoreCommandParser private constructor(private val eventSource: Ob
             if (channel != null) return Observable.empty()
 
             /* This is us - we need to create a new channel for sure if we are getting this */
-            channel = ChannelImpl(channelName, eventSource, outputSink)
+            channel = creationHooks.channel(channelName, eventSource, outputSink)
         } else if (channel == null) return channelMissing()
 
         return Observable.just(JoinEvent(channel, user))
@@ -132,10 +138,11 @@ internal class CoreCommandParser private constructor(private val eventSource: Ob
     private fun userMissing(): Observable<Event> = Observable.empty()
 
     companion object {
-        fun create(eventSource: Observable<Event>,
+        fun create(creationHooks: AtomCreationHooks,
+                   eventSource: Observable<Event>,
                    outputSink: PublishSubject<Message>,
                    channelTracker: ChannelTracker,
                    userTracker: UserTracker): CoreCommandParser =
-            CoreCommandParser(eventSource, outputSink, channelTracker, userTracker)
+            CoreCommandParser(creationHooks, eventSource, outputSink, channelTracker, userTracker)
     }
 }

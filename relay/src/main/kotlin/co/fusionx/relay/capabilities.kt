@@ -2,7 +2,6 @@ package co.fusionx.relay
 
 data class Capability(val capabilityType: String, val value: String?) {
     override fun toString(): String = capabilityType + if (value == null) "" else "=${value}"
-
     companion object
 }
 

@@ -19,15 +19,6 @@ public enum class Status {
 }
 
 /**
- * An entry-point which aggregates different IRC subsystems into one unified interface.
- */
-public interface Client {
-    public val server: Server
-    public val session: Session
-    public val channelTracker: ChannelTracker
-}
-
-/**
  * Represents an IRC session
  */
 public interface Session : EventProducer<Event> {

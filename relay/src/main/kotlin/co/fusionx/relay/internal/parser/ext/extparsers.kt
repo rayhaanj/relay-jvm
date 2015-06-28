@@ -3,10 +3,7 @@ package co.fusionx.relay.internal.parser.ext
 import co.fusionx.irc.message.CodeMessage
 import co.fusionx.irc.message.CommandMessage
 import co.fusionx.irc.message.Message
-import co.fusionx.relay.ChannelTracker
-import co.fusionx.relay.Event
-import co.fusionx.relay.Session
-import co.fusionx.relay.UserTracker
+import co.fusionx.relay.*
 import co.fusionx.relay.internal.parser.EventParser
 import rx.Observable
 import rx.subjects.PublishSubject
@@ -20,7 +17,8 @@ interface CodeExtParser : EventParser<CodeMessage> {
 }
 
 public object ExtensionParsers {
-    public fun commandParsers(session: Session,
+    public fun commandParsers(atomCreationHooks: AtomCreationHooks,
+                              session: Session,
                               eventSource: Observable<Event>,
                               outputSink: PublishSubject<Message>,
                               channelTracker: ChannelTracker,
@@ -28,7 +26,7 @@ public object ExtensionParsers {
         Observable.just(
             AccountNotifyParser(session, channelTracker, userTracker),
             AwayNotifyParser(session, eventSource, outputSink, channelTracker, userTracker),
-            ExtendedJoinParser(session, eventSource, outputSink, channelTracker, userTracker)
+            ExtendedJoinParser(atomCreationHooks, session, eventSource, outputSink, channelTracker, userTracker)
         )
     }
 

@@ -2,15 +2,15 @@ package co.fusionx.relay.internal.parser
 
 import co.fusionx.irc.message.CodeMessage
 import co.fusionx.relay.*
-import co.fusionx.relay.internal.UserImpl
 import co.fusionx.relay.internal.protocol.LevelledNick
 import co.fusionx.relay.internal.protocol.ReplyCodes
 import co.fusionx.relay.rx.filterNotNull
 import rx.Observable
 
-class CoreCodeParser private constructor(private val eventSource: Observable<Event>,
+class CoreCodeParser private constructor(private val creationHooks: AtomCreationHooks,
+                                         private val eventSource: Observable<Event>,
                                          override val channelTracker: ChannelTracker,
-                                         override val userTracker: UserTracker) : EventParser<co.fusionx.irc.message.CodeMessage> {
+                                         override val userTracker: UserTracker) : EventParser<CodeMessage> {
 
     override fun parse(message: CodeMessage): Observable<Event> = when (message.code) {
         ReplyCodes.RPL_WELCOME -> onWelcome(message)
@@ -52,7 +52,7 @@ class CoreCodeParser private constructor(private val eventSource: Observable<Eve
             /* Filter out the nulls */
             .filterNotNull()
             /* ...we need to convert each of the nicks in the names to a user or create one... */
-            .map { LevelledUser(it.level, userTracker.user(it.nick) ?: UserImpl(it.nick, eventSource)) }
+            .map { LevelledUser(it.level, userTracker.user(it.nick) ?: creationHooks.user(it.nick, eventSource)) }
             /* ...collect them up... */
             .toList()
             /* ...and emit an event. */
@@ -60,8 +60,10 @@ class CoreCodeParser private constructor(private val eventSource: Observable<Eve
     }
 
     companion object {
-        fun create(eventSource: Observable<Event>,
+        fun create(creationHooks: AtomCreationHooks,
+                   eventSource: Observable<Event>,
                    channelTracker: ChannelTracker,
-                   userTracker: UserTracker): CoreCodeParser = CoreCodeParser(eventSource, channelTracker, userTracker)
+                   userTracker: UserTracker): CoreCodeParser =
+            CoreCodeParser(creationHooks, eventSource, channelTracker, userTracker)
     }
 }
