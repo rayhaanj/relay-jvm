@@ -12,9 +12,12 @@ public interface Hooks {
     public val atomCreation: AtomCreationHooks
 }
 
-public object DefaultHooks : Hooks {
-    override val atomCreation: AtomCreationHooks = DefaultAtomCreationHooks
+public interface AbstractHooks : Hooks {
+    override val atomCreation: AtomCreationHooks
+        get() = DefaultAtomCreationHooks
 }
+
+public object DefaultHooks : AbstractHooks
 
 /**
  * Hook methods invoked when an atom is created.
@@ -45,7 +48,7 @@ public interface AtomCreationHooks {
     public fun user(initialNick: String, eventSource: Observable<Event>): User
 }
 
-public object DefaultAtomCreationHooks : AtomCreationHooks {
+public interface AbstractAtomCreationHooks : AtomCreationHooks {
     override fun session(eventSource: Observable<Event>, messageSink: PublishSubject<Message>): Session =
         onSession(SessionImpl(eventSource, messageSink))
 
@@ -63,3 +66,5 @@ public object DefaultAtomCreationHooks : AtomCreationHooks {
     override fun user(initialNick: String, eventSource: Observable<Event>): User =
         onUser(UserImpl(initialNick, eventSource))
 }
+
+public object DefaultAtomCreationHooks : AbstractAtomCreationHooks
