@@ -9,7 +9,7 @@ import rx.Observable
 import rx.subjects.PublishSubject
 
 interface CommandExtParser : EventParser<CommandMessage> {
-    public val capability: String
+    public val capabilities: Set<String>
 
     public fun canParse(message: CommandMessage): Boolean
 }

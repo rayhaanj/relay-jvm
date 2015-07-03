@@ -11,7 +11,7 @@ class AccountNotifyParser(private val session: Session,
                           override val channelTracker: ChannelTracker,
                           override val userTracker: UserTracker) : CommandExtParser {
 
-    override val capability: String = "account-notify"
+    override val capabilities = setOf("account-notify")
     private val command: String = "ACCOUNT"
 
     override fun parse(message: CommandMessage): Observable<Event> {
@@ -20,5 +20,5 @@ class AccountNotifyParser(private val session: Session,
     }
 
     override fun canParse(message: CommandMessage): Boolean =
-        message.command == command && session.capabilities.contains(capability)
+        message.command == command && session.capabilities.intersect(capabilities).isNotEmpty()
 }
