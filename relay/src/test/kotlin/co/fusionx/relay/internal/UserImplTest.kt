@@ -1,7 +1,7 @@
 package co.fusionx.relay.internal
 
 import co.fusionx.relay.*
-import org.assertj.core.api.Assertions.assertThat
+import co.fusionx.relay.test.assertThat
 import org.mockito.Mockito.mock
 import rx.observers.TestSubscriber
 import rx.subjects.PublishSubject

@@ -13,7 +13,6 @@ import org.mockito.Mockito.never
 import org.mockito.Mockito.verify
 import rx.Observable
 import rx.observers.TestSubscriber
-import org.junit.Before as befor
 import org.junit.Before as before
 import org.junit.Test as test
 
