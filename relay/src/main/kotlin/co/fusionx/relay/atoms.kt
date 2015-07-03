@@ -14,8 +14,8 @@ public enum class UserLevel private constructor(val char: String) {
 
 public enum class Status {
     DISCONNECTED,
-    CONNECTED,
-    REGISTERED
+    SOCKET_CONNECTED,
+    CONNECTED
 }
 
 /**

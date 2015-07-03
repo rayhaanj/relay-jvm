@@ -8,6 +8,7 @@ import co.fusionx.relay.internal.event.CoreEventHandler
 import co.fusionx.relay.internal.network.NetworkConnection
 import co.fusionx.relay.internal.network.TCPSocketConnection
 import co.fusionx.relay.internal.parser.DelegatingEventParser
+import co.fusionx.relay.internal.parser.ext.ExtensionParsers
 import co.fusionx.relay.internal.sturdy.SturdyConnection
 import co.fusionx.relay.internal.sturdy.ThreadedSturdyConnection
 import rx.Observable
@@ -63,12 +64,16 @@ public class ClientImpl(private val hooks: Hooks,
         session = hooks.atomCreation.session(eventSource, messageSink)
         server = hooks.atomCreation.server(eventSource, messageSink)
 
+        /* Create the extension command parsers */
+        val extCommands = ExtensionParsers.commandParsers(hooks.atomCreation, session, eventSource,
+            messageSink, channelTracker, userTracker)
+
         /* Initialize the message -> event converter */
-        eventParser = DelegatingEventParser.create(hooks.atomCreation, session, eventSource, messageSink,
+        eventParser = DelegatingEventParser.create(hooks.atomCreation, extCommands, eventSource, messageSink,
             channelTracker, userTracker)
 
         /* Generate the core handler and make it start observing */
-        val coreHandler = CoreEventHandler(userConfiguration, session)
+        val coreHandler = CoreEventHandler(userConfiguration, session, extCommands)
         coreHandler.handle(eventSource, messageSink)
 
         /* Start the actual connection */

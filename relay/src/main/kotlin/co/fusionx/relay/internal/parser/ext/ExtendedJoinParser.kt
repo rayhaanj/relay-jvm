@@ -13,7 +13,7 @@ class ExtendedJoinParser(private val creationHooks: AtomCreationHooks,
                          override val channelTracker: ChannelTracker,
                          override val userTracker: UserTracker) : CommandExtParser {
 
-    private val capability: String = "extended-join"
+    override val capability: String = "extended-join"
     private val command: String = "JOIN"
 
     override fun parse(message: CommandMessage): Observable<Event> {

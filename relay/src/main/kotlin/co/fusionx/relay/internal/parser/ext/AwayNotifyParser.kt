@@ -16,7 +16,7 @@ class AwayNotifyParser(private val session: Session,
                        override val channelTracker: ChannelTracker,
                        override val userTracker: UserTracker) : CommandExtParser {
 
-    private val capability = "away-notify"
+    override val capability = "away-notify"
     private val command = "AWAY"
 
     override fun parse(message: CommandMessage): Observable<Event> {

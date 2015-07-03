@@ -9,6 +9,8 @@ import rx.Observable
 import rx.subjects.PublishSubject
 
 interface CommandExtParser : EventParser<CommandMessage> {
+    public val capability: String
+
     public fun canParse(message: CommandMessage): Boolean
 }
 
@@ -22,13 +24,12 @@ public object ExtensionParsers {
                               eventSource: Observable<Event>,
                               outputSink: PublishSubject<Message>,
                               channelTracker: ChannelTracker,
-                              userTracker: UserTracker): Observable<CommandExtParser> = Observable.defer {
+                              userTracker: UserTracker): Observable<CommandExtParser> =
         Observable.just(
             AccountNotifyParser(session, channelTracker, userTracker),
             AwayNotifyParser(session, eventSource, outputSink, channelTracker, userTracker),
             ExtendedJoinParser(atomCreationHooks, session, eventSource, outputSink, channelTracker, userTracker)
         )
-    }
 
     public fun codeParsers(): Observable<CodeExtParser> = Observable.defer {
         Observable.empty<CodeExtParser>()

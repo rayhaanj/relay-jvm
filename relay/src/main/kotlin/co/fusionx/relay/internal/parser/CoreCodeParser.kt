@@ -28,7 +28,7 @@ class CoreCodeParser private constructor(private val creationHooks: AtomCreation
                 Observable.just(
                     NickEvent(userTracker.self, it, message.target),
                     ServerGenericCodeEvent(message.code, text),
-                    StatusEvent(Status.REGISTERED)
+                    StatusEvent(Status.CONNECTED)
                 )
             }
     }

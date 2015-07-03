@@ -3,7 +3,10 @@ package co.fusionx.relay.internal.parser
 import co.fusionx.irc.message.CodeMessage
 import co.fusionx.irc.message.CommandMessage
 import co.fusionx.irc.message.Message
-import co.fusionx.relay.*
+import co.fusionx.relay.AtomCreationHooks
+import co.fusionx.relay.ChannelTracker
+import co.fusionx.relay.Event
+import co.fusionx.relay.UserTracker
 import co.fusionx.relay.internal.parser.ext.CodeExtParser
 import co.fusionx.relay.internal.parser.ext.CommandExtParser
 import co.fusionx.relay.internal.parser.ext.ExtensionParsers
@@ -37,15 +40,13 @@ class DelegatingEventParser(private val coreCommandParser: EventParser<CommandMe
 
     companion object {
         fun create(creationHooks: AtomCreationHooks,
-                   session: Session,
+                   extCommands: Observable<CommandExtParser>,
                    events: Observable<Event>,
                    output: PublishSubject<Message>,
                    channels: ChannelTracker,
                    users: UserTracker): DelegatingEventParser {
             val command = CoreCommandParser.create(creationHooks, events, output, channels, users)
             val code = CoreCodeParser.create(creationHooks, events, channels, users)
-            val extCommands = ExtensionParsers.commandParsers(creationHooks, session, events,
-                output, channels, users)
             val extCodes = ExtensionParsers.codeParsers()
 
             return DelegatingEventParser(command, code, extCommands, extCodes)

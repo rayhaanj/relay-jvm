@@ -11,7 +11,7 @@ class AccountNotifyParser(private val session: Session,
                           override val channelTracker: ChannelTracker,
                           override val userTracker: UserTracker) : CommandExtParser {
 
-    private val capability: String = "account-notify"
+    override val capability: String = "account-notify"
     private val command: String = "ACCOUNT"
 
     override fun parse(message: CommandMessage): Observable<Event> {

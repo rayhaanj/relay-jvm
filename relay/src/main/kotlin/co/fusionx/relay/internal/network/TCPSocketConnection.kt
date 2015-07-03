@@ -47,7 +47,7 @@ public class TCPSocketConnection private constructor(override val rawSource: Pub
         }
 
         /* Report the status */
-        rawStatusSource.onNext(Status.CONNECTED)
+        rawStatusSource.onNext(Status.SOCKET_CONNECTED)
 
         /* Start the source reading loop */
         var line = source.readUtf8Line()
