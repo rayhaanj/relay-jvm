@@ -13,17 +13,16 @@ subprojects {
 }
 
 ext {
-    kotlinPlugin = 'org.jetbrains.kotlin:kotlin-gradle-plugin:0.12.613'
-    kotlinStdlib = 'org.jetbrains.kotlin:kotlin-stdlib:0.12.613'
-    kotlinReflect = 'org.jetbrains.kotlin:kotlin-reflect:0.12.613'
+    kotlinPlugin = 'org.jetbrains.kotlin:kotlin-gradle-plugin:0.12.1218'
+    kotlinStdlib = 'org.jetbrains.kotlin:kotlin-stdlib:0.12.1218'
+    kotlinReflect = 'org.jetbrains.kotlin:kotlin-reflect:0.12.1218'
 
-    ircProtocol = 'co.fusionx.irc:irc-protocol-jvm:0.1.5-SNAPSHOT'
+    ircProtocol = 'co.fusionx.irc:irc-protocol-jvm:0.1.7-SNAPSHOT'
 
     rxJava = 'io.reactivex:rxjava:1.0.12'
-    okio = 'com.squareup.okio:okio:1.4.0'
+    okio = 'com.squareup.okio:okio:1.5.0'
 
     junit = 'junit:junit:4.12'
     assertj = 'org.assertj:assertj-core:2.1.0'
-    truth = 'com.google.truth:truth:0.27'
-    mockito = 'org.mockito:mockito-core:2.0.17-beta'
+    mockito = 'org.mockito:mockito-core:2.0.28-beta'
 }
