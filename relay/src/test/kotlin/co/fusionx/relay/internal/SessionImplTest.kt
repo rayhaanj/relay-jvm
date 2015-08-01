@@ -58,5 +58,6 @@ public class SessionImplTest {
         session.join("#relay")
 
         messageSubscriber.assertValue(ClientMessageGenerator.join("#relay"))
+        messageSubscriber.assertNoErrors()
     }
 }
