@@ -17,11 +17,9 @@ class ExtendedJoinParser(private val creationHooks: AtomCreationHooks,
     private val command: String = "JOIN"
 
     override fun parse(message: CommandMessage): Observable<Event> {
-        /* Parse the arguments */
         val nick = message.prefix?.serverNameOrNick ?: return prefixMissing()
         val (channelName) = message.arguments
 
-        /* Get the user and the channel */
         val user = userTracker.user(nick) ?: creationHooks.user(nick, eventSource)
         var channel = channelTracker.channel(channelName)
 
@@ -29,7 +27,6 @@ class ExtendedJoinParser(private val creationHooks: AtomCreationHooks,
             /* TODO - return an error here */
             if (channel != null) return Observable.empty()
 
-            /* This is us - we need to create a new channel for sure if we are getting this */
             channel = creationHooks.channel(channelName, eventSource, outputSink)
         } else if (channel == null) return channelMissing()
 

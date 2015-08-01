@@ -57,8 +57,6 @@ internal class CoreCommandParser private constructor(
         if (user == userTracker.self) {
             /* TODO - return an error here */
             if (channel != null) return Observable.empty()
-
-            /* This is us - we need to create a new channel for sure if we are getting this */
             channel = creationHooks.channel(channelName, eventSource, outputSink)
         } else if (channel == null) return channelMissing()
 
@@ -82,11 +80,9 @@ internal class CoreCommandParser private constructor(
     }
 
     private fun onQuit(message: CommandMessage): Observable<Event> {
-        /* Parse the arguments */
         val nick = message.prefix?.serverNameOrNick ?: return prefixMissing()
         val user = userTracker.user(nick) ?: return userMissing()
 
-        /* Parse the arguments */
         val reason = message.arguments.getOrNull(0)
 
         return Observable.from(user.channels)
@@ -95,12 +91,10 @@ internal class CoreCommandParser private constructor(
     }
 
     private fun onPart(message: CommandMessage): Observable<Event> {
-        /* Parse the arguments */
         val nick = message.prefix?.serverNameOrNick ?: return prefixMissing()
         val (channelName) = message.arguments
         val reason = message.arguments.getOrNull(1)
 
-        /* Get the user and the channel */
         val user = userTracker.user(nick) ?: return userMissing()
         val channel = channelTracker.channel(channelName) ?: return channelMissing()
 
@@ -112,11 +106,9 @@ internal class CoreCommandParser private constructor(
     private fun onNotice(message: CommandMessage): Observable<Event> = onMessage(message)
 
     private fun onMessage(message: CommandMessage): Observable<Event> {
-        /* Parse the arguments */
         val nick = message.prefix?.serverNameOrNick ?: return prefixMissing()
         val (target, text) = message.arguments
 
-        /* Get the sender of the message */
         val sender = userTracker.user(nick)
 
         if (target.isChannel()) {

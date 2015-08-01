@@ -25,14 +25,12 @@ class DelegatingEventParser(private val coreCommandParser: EventParser<CommandMe
     }
 
     private fun parseCommand(message: CommandMessage): Observable<Event> = extCommandParsers
-        /* Get an extension parser which might be able to parse the message */
         .filter { it.canParse(message) }
         .map<EventParser<CommandMessage>> { it }
         .firstOrDefault(coreCommandParser)
         .concatMap { it.parse(message) }
 
     private fun parseCode(message: CodeMessage): Observable<Event> = extCodeParsers
-        /* Get an extension parser which might be able to parse the message */
         .filter { it.canParse(message) }
         .map<EventParser<CodeMessage>> { it }
         .firstOrDefault(coreCodeParser)
