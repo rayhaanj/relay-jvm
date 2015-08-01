@@ -6,8 +6,8 @@ import co.fusionx.relay.Event
 import co.fusionx.relay.UserTracker
 
 public interface EventParser<T : Message> {
-    val channelTracker: ChannelTracker
-    val userTracker: UserTracker
+    protected val channelTracker: ChannelTracker
+    protected val userTracker: UserTracker
 
     fun parse(message: T): rx.Observable<Event>
 }
