@@ -1,5 +1,6 @@
 package co.fusionx.relay.internal
 
+import co.fusionx.irc.message.ClientMessageGenerator
 import co.fusionx.irc.message.Message
 import co.fusionx.relay.*
 import co.fusionx.relay.test.assertThat
@@ -14,7 +15,6 @@ public class SessionImplTest {
     private val session = SessionImpl(eventSource, outputSink)
 
     private val statusSubscriber = TestSubscriber<Status>()
-    private val eventSubscriber = TestSubscriber<Event>()
     private val messageSubscriber = TestSubscriber<Message>()
 
     public test fun testDefaultStatus() {
@@ -51,5 +51,12 @@ public class SessionImplTest {
         eventSource.onNext(CapEvent(CapType.ACK, true, listOf(capNotify)))
 
         assertThat(session.capabilities).containsOnly(sasl, capNotify)
+    }
+
+    public test fun testJoinCommand() {
+        outputSink.subscribe(messageSubscriber)
+        session.join("#relay")
+
+        messageSubscriber.assertValue(ClientMessageGenerator.join("#relay"))
     }
 }
