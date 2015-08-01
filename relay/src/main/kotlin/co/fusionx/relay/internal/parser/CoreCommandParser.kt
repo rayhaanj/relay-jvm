@@ -38,21 +38,19 @@ internal class CoreCommandParser private constructor(
         val subCommand = CapType.parse(subCommandString) ?: return Observable.empty()
 
         /* We need to check if we have a multi-line cap here */
-        val capsIndex = if (third == "*") 3 else 2
-        val caps = message.arguments[capsIndex]
+        val finalLine = third != "*"
+        val caps = message.arguments[if (finalLine) 2 else 3]
             .split(' ')
             .map { Capability.parse(it) }
             .filterNotNull()
 
-        return Observable.just(CapEvent(subCommand, caps))
+        return Observable.just(CapEvent(subCommand, finalLine, caps))
     }
 
     private fun onJoin(message: CommandMessage): Observable<Event> {
-        /* Parse the arguments */
         val nick = message.prefix?.serverNameOrNick ?: return prefixMissing()
         val (channelName) = message.arguments
 
-        /* Get the user and the channel */
         val user = userTracker.user(nick) ?: creationHooks.user(nick, eventSource)
         var channel = channelTracker.channel(channelName)
 
@@ -68,11 +66,9 @@ internal class CoreCommandParser private constructor(
     }
 
     private fun onNick(message: CommandMessage): Observable<Event> {
-        /* Parse the arguments */
         val oldNick = message.prefix?.serverNameOrNick ?: return prefixMissing()
         val (newNick) = message.arguments
 
-        /* Get the user in the tracker */
         val user = userTracker.user(oldNick) ?: return userMissing()
 
         return Observable.from(user.channels)

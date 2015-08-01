@@ -37,6 +37,7 @@ data class ServerNoticeEvent(val sender: User?,
  * TODO
  */
 data class CapEvent(val capType: CapType,
+                    val lastLine: Boolean = true,
                     val capabilities: List<Capability> = listOf()) : SessionEvent
 
 /**
