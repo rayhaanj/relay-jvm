@@ -2,6 +2,7 @@ package co.fusionx.relay.internal.parser
 
 import co.fusionx.irc.message.CodeMessage
 import co.fusionx.relay.*
+import co.fusionx.relay.internal.isChannel
 import co.fusionx.relay.internal.protocol.LevelledNick
 import co.fusionx.relay.internal.protocol.ReplyCodes
 import co.fusionx.relay.rx.filterNotNull
@@ -15,7 +16,7 @@ class CoreCodeParser private constructor(private val creationHooks: AtomCreation
     override fun parse(message: CodeMessage): Observable<Event> = when (message.code) {
         ReplyCodes.RPL_WELCOME -> onWelcome(message)
         ReplyCodes.RPL_ISUPPORT -> onISupport(message)
-        353 -> onNames(message)
+        ReplyCodes.RPL_NAMES -> onNames(message)
         else -> Observable.empty()
     }
 
@@ -33,29 +34,27 @@ class CoreCodeParser private constructor(private val creationHooks: AtomCreation
             }
     }
 
-    private fun onISupport(message: CodeMessage): Observable<Event> {
-        return Observable.empty()
-    }
+    // TODO(tilal6991) implement ISUPPORT
+    private fun onISupport(message: CodeMessage): Observable<Event> = Observable.empty()
 
     fun onNames(message: CodeMessage): Observable<Event> {
-        /* Parse the arguments */
-        val (_, channelName, nicks) = message.arguments
+        /* RFC1459 and RFC2812 vary here. We try to account for both cases. */
+        val (firstArg) = message.arguments
+        val offset = if (firstArg.isChannel()) 0 else 1
+
+        val channelName = message.arguments[offset]
+        val nicks = message.arguments[1 + offset]
+
         val nickList = nicks.split(' ')
 
         /* TODO - maybe return an error here? */
         val channel = channelTracker.channel(channelName) ?: return Observable.empty()
 
-        /* For a names reply */
         return Observable.from(nickList)
-            /* Get the levelled nick out */
             .map { LevelledNick.parse(it) }
-            /* Filter out the nulls */
             .filterNotNull()
-            /* ...we need to convert each of the nicks in the names to a user or create one... */
             .map { LevelledUser(it.level, userTracker.user(it.nick) ?: creationHooks.user(it.nick, eventSource)) }
-            /* ...collect them up... */
             .toList()
-            /* ...and emit an event. */
             .map { ChannelNamesReplyEvent(channel, it) }
     }
 
