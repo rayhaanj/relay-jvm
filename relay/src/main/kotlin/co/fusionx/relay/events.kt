@@ -92,7 +92,7 @@ data class QuitEvent(override val user: User,
  */
 data class ChannelQuitEvent(override val channel: Channel,
                             override val user: User,
-                            val reason: String?) : ChannelEvent, UserEvent
+                            val reason: String? = null) : ChannelEvent, UserEvent
 
 
 /* Used specially inside Names (and eventually WHOIS) */
