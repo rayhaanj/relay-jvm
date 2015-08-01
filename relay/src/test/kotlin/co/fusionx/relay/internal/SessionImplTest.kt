@@ -41,4 +41,15 @@ public class SessionImplTest {
 
         assertThat(session.capabilities).contains(capability)
     }
+
+    public test fun testMultiLineCaps() {
+        val sasl = Capability("sasl")
+        eventSource.onNext(CapEvent(CapType.ACK, false, listOf(sasl)))
+        assertThat(session.capabilities).isEmpty()
+
+        val capNotify = Capability("cap-notify")
+        eventSource.onNext(CapEvent(CapType.ACK, true, listOf(capNotify)))
+
+        assertThat(session.capabilities).containsOnly(sasl, capNotify)
+    }
 }
