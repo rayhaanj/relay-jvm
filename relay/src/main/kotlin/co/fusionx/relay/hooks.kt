@@ -43,7 +43,7 @@ public interface AtomCreationHooks {
 
     public fun channel(channelName: String,
                        eventSource: Observable<Event>,
-                       messageSink: PublishSubject<Message>,
+                       outputSink: PublishSubject<Message>,
                        mainExecutor: ExecutorService): Channel
 
     public fun query(eventSource: Observable<Event>, messageSink: PublishSubject<Message>): Query
@@ -60,9 +60,9 @@ public interface AbstractAtomCreationHooks : AtomCreationHooks {
 
     override final fun channel(channelName: String,
                                eventSource: Observable<Event>,
-                               messageSink: PublishSubject<Message>,
+                               outputSink: PublishSubject<Message>,
                                mainExecutor: ExecutorService): Channel =
-        onChannel(ChannelImpl(channelName, eventSource, messageSink, mainExecutor))
+        onChannel(ChannelImpl(channelName, eventSource, outputSink, mainExecutor))
 
     override final fun query(eventSource: Observable<Event>, messageSink: PublishSubject<Message>): Query =
         onQuery(object : Query {})
