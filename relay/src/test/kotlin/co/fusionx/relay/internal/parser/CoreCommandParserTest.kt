@@ -95,8 +95,9 @@ public class CoreCommandParserTest {
     }
 
     public test fun testNick() {
-        val user = mock(javaClass<User>())
+        val (user, channel) = Pair(mock(javaClass<User>()), mock(javaClass<Channel>()))
         `when`(userTracker.user("relay")).thenReturn(user)
+        `when`(user.channels).thenReturn(setOf(channel))
 
         val message = CommandMessageData(
             prefix = Prefix("relay"),
@@ -105,7 +106,8 @@ public class CoreCommandParserTest {
         )
         coreCommandParser.parse(message).subscribe(eventSubscriber)
 
-        eventSubscriber.assertValueCompletedNoErrors(NickEvent(user, "relay", "new-relay"))
+        eventSubscriber.assertValuesCompletedNoErrors(NickEvent(user, "relay", "new-relay"),
+            ChannelNickEvent(channel, user, "relay", "new-relay"))
     }
 
     public test fun testPing() {

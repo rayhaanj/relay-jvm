@@ -20,7 +20,7 @@ class ExtendedJoinParser(private val creationHooks: AtomCreationHooks,
 
     override fun parse(message: CommandMessage): Observable<Event> {
         val nick = message.prefix?.serverNameOrNick ?: return prefixMissing()
-        val (channelName) = message.arguments
+        val (channelName, accountName, realName) = message.arguments
 
         val user = userTracker.user(nick) ?: creationHooks.user(nick, eventSource)
         var channel = channelTracker.channel(channelName)
