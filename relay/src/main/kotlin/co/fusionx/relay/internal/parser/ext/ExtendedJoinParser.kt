@@ -5,11 +5,13 @@ import co.fusionx.irc.message.Message
 import co.fusionx.relay.*
 import rx.Observable
 import rx.subjects.PublishSubject
+import java.util.concurrent.ExecutorService
 
 class ExtendedJoinParser(private val creationHooks: AtomCreationHooks,
                          private val session: Session,
                          private val eventSource: Observable<Event>,
                          private val outputSink: PublishSubject<Message>,
+                         private val mainExecutor: ExecutorService,
                          override val channelTracker: ChannelTracker,
                          override val userTracker: UserTracker) : CommandExtParser {
 
@@ -27,7 +29,7 @@ class ExtendedJoinParser(private val creationHooks: AtomCreationHooks,
             /* TODO - return an error here */
             if (channel != null) return Observable.empty()
 
-            channel = creationHooks.channel(channelName, eventSource, outputSink)
+            channel = creationHooks.channel(channelName, eventSource, outputSink, mainExecutor)
         } else if (channel == null) return channelMissing()
 
         return Observable.just(JoinEvent(channel, user))

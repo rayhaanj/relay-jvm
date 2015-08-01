@@ -43,9 +43,10 @@ public class ClientImpl(private val hooks: Hooks,
         sturdyConnection = ThreadedSturdyConnection.create(networkConnection)
 
         /* Explicitly cross thread boundary here for the source observables */
-        val sourceScheduler = Schedulers.from(Executors.newSingleThreadExecutor())
-        val rawSource = networkConnection.rawSource.onBackpressureBuffer().observeOn(sourceScheduler)
-        val rawStatusSource = networkConnection.rawStatusSource.onBackpressureBuffer().observeOn(sourceScheduler)
+        val mainExecutor = Executors.newSingleThreadExecutor()
+        val mainScheduler = Schedulers.from(mainExecutor)
+        val rawSource = networkConnection.rawSource.onBackpressureBuffer().observeOn(mainScheduler)
+        val rawStatusSource = networkConnection.rawStatusSource.onBackpressureBuffer().observeOn(mainScheduler)
 
         val eventSource = generateEventSource(rawSource, rawStatusSource)
 
@@ -60,9 +61,9 @@ public class ClientImpl(private val hooks: Hooks,
         server = hooks.atomCreation.server(eventSource, messageSink)
 
         val extCommands = ExtensionParsers.commandParsers(hooks.atomCreation, session, eventSource,
-            messageSink, channelTracker, userTracker)
+            messageSink, mainExecutor, channelTracker, userTracker)
         eventParser = DelegatingEventParser.create(hooks.atomCreation, extCommands, eventSource, messageSink,
-            channelTracker, userTracker)
+            mainExecutor, channelTracker, userTracker)
 
         val coreHandler = eventHandlers(userConfiguration, session)
         coreHandler.subscribe { it.handle(eventSource, messageSink) }

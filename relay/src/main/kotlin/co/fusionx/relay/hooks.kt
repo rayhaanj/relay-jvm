@@ -7,6 +7,8 @@ import co.fusionx.relay.internal.SessionImpl
 import co.fusionx.relay.internal.UserImpl
 import rx.Observable
 import rx.subjects.PublishSubject
+import java.util.concurrent.Executor
+import java.util.concurrent.ExecutorService
 
 public interface Hooks {
     public val atomCreation: AtomCreationHooks
@@ -41,7 +43,8 @@ public interface AtomCreationHooks {
 
     public fun channel(channelName: String,
                        eventSource: Observable<Event>,
-                       messageSink: PublishSubject<Message>): Channel
+                       messageSink: PublishSubject<Message>,
+                       mainExecutor: ExecutorService): Channel
 
     public fun query(eventSource: Observable<Event>, messageSink: PublishSubject<Message>): Query
 
@@ -49,21 +52,22 @@ public interface AtomCreationHooks {
 }
 
 public interface AbstractAtomCreationHooks : AtomCreationHooks {
-    override fun session(eventSource: Observable<Event>, messageSink: PublishSubject<Message>): Session =
+    override final fun session(eventSource: Observable<Event>, messageSink: PublishSubject<Message>): Session =
         onSession(SessionImpl(eventSource, messageSink))
 
-    override fun server(eventSource: Observable<Event>, messageSink: PublishSubject<Message>): Server =
+    override final fun server(eventSource: Observable<Event>, messageSink: PublishSubject<Message>): Server =
         onServer(ServerImpl(eventSource, messageSink))
 
-    override fun channel(channelName: String,
-                         eventSource: Observable<Event>,
-                         messageSink: PublishSubject<Message>): Channel =
-        onChannel(ChannelImpl(channelName, eventSource, messageSink))
+    override final fun channel(channelName: String,
+                               eventSource: Observable<Event>,
+                               messageSink: PublishSubject<Message>,
+                               mainExecutor: ExecutorService): Channel =
+        onChannel(ChannelImpl(channelName, eventSource, messageSink, mainExecutor))
 
-    override fun query(eventSource: Observable<Event>, messageSink: PublishSubject<Message>): Query =
+    override final fun query(eventSource: Observable<Event>, messageSink: PublishSubject<Message>): Query =
         onQuery(object : Query {})
 
-    override fun user(initialNick: String, eventSource: Observable<Event>): User =
+    override final fun user(initialNick: String, eventSource: Observable<Event>): User =
         onUser(UserImpl(initialNick, eventSource))
 }
 

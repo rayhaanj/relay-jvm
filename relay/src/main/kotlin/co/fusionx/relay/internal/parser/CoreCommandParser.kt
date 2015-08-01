@@ -3,18 +3,19 @@ package co.fusionx.relay.internal.parser
 import co.fusionx.irc.message.CommandMessage
 import co.fusionx.irc.message.Message
 import co.fusionx.relay.*
-import co.fusionx.relay.internal.UserImpl
 import co.fusionx.relay.internal.getOrNull
 import co.fusionx.relay.internal.isChannel
 import co.fusionx.relay.internal.parse
 import co.fusionx.relay.internal.protocol.Commands
 import rx.Observable
 import rx.subjects.PublishSubject
+import java.util.concurrent.ExecutorService
 
 internal class CoreCommandParser private constructor(
     private val creationHooks: AtomCreationHooks,
     private val eventSource: Observable<Event>,
     private val outputSink: PublishSubject<Message>,
+    private val mainExecutor: ExecutorService,
     override val channelTracker: ChannelTracker,
     override val userTracker: UserTracker
 ) : EventParser<CommandMessage> {
@@ -57,7 +58,7 @@ internal class CoreCommandParser private constructor(
         if (user == userTracker.self) {
             /* TODO - return an error here */
             if (channel != null) return Observable.empty()
-            channel = creationHooks.channel(channelName, eventSource, outputSink)
+            channel = creationHooks.channel(channelName, eventSource, outputSink, mainExecutor)
         } else if (channel == null) return channelMissing()
 
         return Observable.just(JoinEvent(channel, user))
@@ -129,8 +130,9 @@ internal class CoreCommandParser private constructor(
         fun create(creationHooks: AtomCreationHooks,
                    eventSource: Observable<Event>,
                    outputSink: PublishSubject<Message>,
+                   mainExecutor: ExecutorService,
                    channelTracker: ChannelTracker,
                    userTracker: UserTracker): CoreCommandParser =
-            CoreCommandParser(creationHooks, eventSource, outputSink, channelTracker, userTracker)
+            CoreCommandParser(creationHooks, eventSource, outputSink, mainExecutor, channelTracker, userTracker)
     }
 }

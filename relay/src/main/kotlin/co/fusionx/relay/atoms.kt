@@ -1,6 +1,7 @@
 package co.fusionx.relay
 
 import rx.Observable
+import rx.Single
 
 public enum class UserLevel private constructor(val char: String) {
     OWNER("~"),
@@ -38,6 +39,7 @@ public interface Server : EventProducer<ServerEvent>
  */
 public interface Channel : EventProducer<ChannelEvent> {
     public val name: String
+    public val users: Single<Map<User, List<UserLevel>>>
 
     public fun privmsg(message: String)
 }

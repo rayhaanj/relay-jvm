@@ -12,6 +12,7 @@ import co.fusionx.relay.internal.parser.ext.CommandExtParser
 import co.fusionx.relay.internal.parser.ext.ExtensionParsers
 import rx.Observable
 import rx.subjects.PublishSubject
+import java.util.concurrent.ExecutorService
 
 class DelegatingEventParser(private val coreCommandParser: EventParser<CommandMessage>,
                             private val coreCodeParser: EventParser<CodeMessage>,
@@ -41,9 +42,10 @@ class DelegatingEventParser(private val coreCommandParser: EventParser<CommandMe
                    extCommands: Observable<CommandExtParser>,
                    events: Observable<Event>,
                    output: PublishSubject<Message>,
+                   mainExecutor: ExecutorService,
                    channels: ChannelTracker,
                    users: UserTracker): DelegatingEventParser {
-            val command = CoreCommandParser.create(creationHooks, events, output, channels, users)
+            val command = CoreCommandParser.create(creationHooks, events, output, mainExecutor, channels, users)
             val code = CoreCodeParser.create(creationHooks, events, channels, users)
             val extCodes = ExtensionParsers.codeParsers()
 
