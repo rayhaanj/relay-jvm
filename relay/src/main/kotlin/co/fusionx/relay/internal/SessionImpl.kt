@@ -15,14 +15,23 @@ public class SessionImpl(override val eventSource: Observable<Event>,
     override internal val capabilities: MutableSet<Capability> = HashSet()
 
     init {
-        /* Update the status of the session */
         eventSource.ofType(javaClass<StatusEvent>())
             .subscribe { status.onNext(it.status) }
 
-        /* For an ACK we need to add the ACKed caps into the list */
+        /* Store caps in a local buffer until we hit a last line event and then flush to global */
+        val localBuffer: MutableSet<Capability> = HashSet()
         eventSource.ofType(javaClass<CapEvent>())
             .filter { it.capType == CapType.ACK }
-            .subscribe { capabilities.addAll(it.capabilities) }
+            .subscribe {
+                if (it.lastLine) {
+                    capabilities.addAll(localBuffer)
+                    capabilities.addAll(it.capabilities)
+
+                    localBuffer.clear()
+                } else {
+                    localBuffer.addAll(it.capabilities)
+                }
+            }
     }
 
     override fun join(channelName: String) =
