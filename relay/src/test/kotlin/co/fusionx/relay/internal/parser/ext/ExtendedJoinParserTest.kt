@@ -16,11 +16,11 @@ public class ExtendedJoinParserTest {
     private val eventSource: PublishSubject<Event> = PublishSubject.create()
     private val outputSink: PublishSubject<Message> = PublishSubject.create()
 
-    private val session = mock(javaClass<Session>())
-    private val atomCreationHooks = mock(javaClass<AtomCreationHooks>())
-    private val mainExecutor = mock(javaClass<ExecutorService>())
-    private val channelTracker = mock(javaClass<ChannelTracker>())
-    private val userTracker = mock(javaClass<UserTracker>())
+    private val session = mock<Session>()
+    private val atomCreationHooks = mock<AtomCreationHooks>()
+    private val mainExecutor = mock<ExecutorService>()
+    private val channelTracker = mock<ChannelTracker>()
+    private val userTracker = mock<UserTracker>()
 
     private val extendedJoinParser = ExtendedJoinParser(
         atomCreationHooks,
@@ -35,7 +35,7 @@ public class ExtendedJoinParserTest {
     private val eventSubscriber = TestSubscriber<Event>()
 
     public Test fun testSelfJoin() {
-        val (self, channel) = Pair(mock(javaClass<User>()), mock(javaClass<Channel>()))
+        val (self, channel) = Pair(mock<User>(), mock<Channel>())
         `when`(userTracker.self).thenReturn(self)
         `when`(userTracker.user("relay")).thenReturn(self)
         `when`(atomCreationHooks.channel("#relay", eventSource, outputSink, mainExecutor)).thenReturn(channel)
@@ -47,11 +47,11 @@ public class ExtendedJoinParserTest {
         )
         extendedJoinParser.parse(message).subscribe(eventSubscriber)
 
-        eventSubscriber.assertValueCompletedNoErrors(JoinEvent(channel, self))
+        eventSubscriber.assertValuesCompletedNoErrors(JoinEvent(channel, self))
     }
 
     public Test fun testOtherNewUserJoin() {
-        val (other, channel) = Pair(mock(javaClass<User>()), mock(javaClass<Channel>()))
+        val (other, channel) = Pair(mock<User>(), mock<Channel>())
         `when`(atomCreationHooks.user("relay", eventSource)).thenReturn(other)
         `when`(channelTracker.channel("#relay")).thenReturn(channel)
 
@@ -62,11 +62,11 @@ public class ExtendedJoinParserTest {
         )
         extendedJoinParser.parse(message).subscribe(eventSubscriber)
 
-        eventSubscriber.assertValueCompletedNoErrors(JoinEvent(channel, other))
+        eventSubscriber.assertValuesCompletedNoErrors(JoinEvent(channel, other))
     }
 
     public Test fun testOtherOldUserJoin() {
-        val (other, channel) = Pair(mock(javaClass<User>()), mock(javaClass<Channel>()))
+        val (other, channel) = Pair(mock<User>(), mock<Channel>())
         `when`(userTracker.user("relay")).thenReturn(other)
         `when`(channelTracker.channel("#relay")).thenReturn(channel)
 
@@ -77,6 +77,6 @@ public class ExtendedJoinParserTest {
         )
         extendedJoinParser.parse(message).subscribe(eventSubscriber)
 
-        eventSubscriber.assertValueCompletedNoErrors(JoinEvent(channel, other))
+        eventSubscriber.assertValuesCompletedNoErrors(JoinEvent(channel, other))
     }
 }

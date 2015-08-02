@@ -16,10 +16,10 @@ public class CoreCommandParserTest {
     private val eventSource: PublishSubject<Event> = PublishSubject.create()
     private val outputSink: PublishSubject<Message> = PublishSubject.create()
 
-    private val atomCreationHooks = mock(javaClass<AtomCreationHooks>())
-    private val mainExecutor = mock(javaClass<ExecutorService>())
-    private val channelTracker = mock(javaClass<ChannelTracker>())
-    private val userTracker = mock(javaClass<UserTracker>())
+    private val atomCreationHooks = mock<AtomCreationHooks>()
+    private val mainExecutor = mock<ExecutorService>()
+    private val channelTracker = mock<ChannelTracker>()
+    private val userTracker = mock<UserTracker>()
 
     private val coreCommandParser = CoreCommandParser.create(
         atomCreationHooks,
@@ -37,7 +37,7 @@ public class CoreCommandParserTest {
         coreCommandParser.parse(message).subscribe(eventSubscriber)
 
         val capabilities = listOf(Capability("cap-notify"), Capability("sasl"))
-        eventSubscriber.assertValueCompletedNoErrors(CapEvent(CapType.LS, true, capabilities))
+        eventSubscriber.assertValuesCompletedNoErrors(CapEvent(CapType.LS, true, capabilities))
     }
 
     public test fun testNonFinalCapMessage() {
@@ -45,11 +45,11 @@ public class CoreCommandParserTest {
         coreCommandParser.parse(message).subscribe(eventSubscriber)
 
         val capabilities = listOf(Capability("sasl"))
-        eventSubscriber.assertValueCompletedNoErrors(CapEvent(CapType.LS, false, capabilities))
+        eventSubscriber.assertValuesCompletedNoErrors(CapEvent(CapType.LS, false, capabilities))
     }
 
     public test fun testSelfJoin() {
-        val (self, channel) = Pair(mock(javaClass<User>()), mock(javaClass<Channel>()))
+        val (self, channel) = Pair(mock<User>(), mock<Channel>())
         `when`(userTracker.self).thenReturn(self)
         `when`(userTracker.user("relay")).thenReturn(self)
         `when`(atomCreationHooks.channel("#relay", eventSource, outputSink, mainExecutor)).thenReturn(channel)
@@ -61,11 +61,11 @@ public class CoreCommandParserTest {
         )
         coreCommandParser.parse(message).subscribe(eventSubscriber)
 
-        eventSubscriber.assertValueCompletedNoErrors(JoinEvent(channel, self))
+        eventSubscriber.assertValuesCompletedNoErrors(JoinEvent(channel, self))
     }
 
     public test fun testOtherNewUserJoin() {
-        val (other, channel) = Pair(mock(javaClass<User>()), mock(javaClass<Channel>()))
+        val (other, channel) = Pair(mock<User>(), mock<Channel>())
         `when`(atomCreationHooks.user("relay", eventSource)).thenReturn(other)
         `when`(channelTracker.channel("#relay")).thenReturn(channel)
 
@@ -76,11 +76,11 @@ public class CoreCommandParserTest {
         )
         coreCommandParser.parse(message).subscribe(eventSubscriber)
 
-        eventSubscriber.assertValueCompletedNoErrors(JoinEvent(channel, other))
+        eventSubscriber.assertValuesCompletedNoErrors(JoinEvent(channel, other))
     }
 
     public test fun testOtherOldUserJoin() {
-        val (other, channel) = Pair(mock(javaClass<User>()), mock(javaClass<Channel>()))
+        val (other, channel) = Pair(mock<User>(), mock<Channel>())
         `when`(userTracker.user("relay")).thenReturn(other)
         `when`(channelTracker.channel("#relay")).thenReturn(channel)
 
@@ -91,11 +91,11 @@ public class CoreCommandParserTest {
         )
         coreCommandParser.parse(message).subscribe(eventSubscriber)
 
-        eventSubscriber.assertValueCompletedNoErrors(JoinEvent(channel, other))
+        eventSubscriber.assertValuesCompletedNoErrors(JoinEvent(channel, other))
     }
 
     public test fun testNick() {
-        val (user, channel) = Pair(mock(javaClass<User>()), mock(javaClass<Channel>()))
+        val (user, channel) = Pair(mock<User>(), mock<Channel>())
         `when`(userTracker.user("relay")).thenReturn(user)
         `when`(user.channels).thenReturn(setOf(channel))
 
@@ -117,11 +117,11 @@ public class CoreCommandParserTest {
         )
         coreCommandParser.parse(message).subscribe(eventSubscriber)
 
-        eventSubscriber.assertValueCompletedNoErrors(PingEvent("test.server.relay"))
+        eventSubscriber.assertValuesCompletedNoErrors(PingEvent("test.server.relay"))
     }
 
     public test fun testQuitWithReason() {
-        val (user, channel) = Pair(mock(javaClass<User>()), mock(javaClass<Channel>()))
+        val (user, channel) = Pair(mock<User>(), mock<Channel>())
         `when`(userTracker.user("relay")).thenReturn(user)
         `when`(user.channels).thenReturn(setOf(channel))
 
@@ -137,7 +137,7 @@ public class CoreCommandParserTest {
     }
 
     public test fun testQuitWithoutReason() {
-        val (user, channel) = Pair(mock(javaClass<User>()), mock(javaClass<Channel>()))
+        val (user, channel) = Pair(mock<User>(), mock<Channel>())
         `when`(userTracker.user("relay")).thenReturn(user)
         `when`(user.channels).thenReturn(setOf(channel))
 
@@ -152,7 +152,7 @@ public class CoreCommandParserTest {
     }
 
     public test fun testPartWithReason() {
-        val (user, channel) = Pair(mock(javaClass<User>()), mock(javaClass<Channel>()))
+        val (user, channel) = Pair(mock<User>(), mock<Channel>())
         `when`(userTracker.user("relay")).thenReturn(user)
         `when`(channelTracker.channel("#relay")).thenReturn(channel)
 
@@ -167,7 +167,7 @@ public class CoreCommandParserTest {
     }
 
     public test fun testPartWithoutReason() {
-        val (user, channel) = Pair(mock(javaClass<User>()), mock(javaClass<Channel>()))
+        val (user, channel) = Pair(mock<User>(), mock<Channel>())
         `when`(userTracker.user("relay")).thenReturn(user)
         `when`(channelTracker.channel("#relay")).thenReturn(channel)
 
@@ -182,7 +182,7 @@ public class CoreCommandParserTest {
     }
 
     public test fun testPrivmsgToChannel() {
-        val (user, channel) = Pair(mock(javaClass<User>()), mock(javaClass<Channel>()))
+        val (user, channel) = Pair(mock<User>(), mock<Channel>())
         `when`(userTracker.user("relay")).thenReturn(user)
         `when`(channelTracker.channel("#relay")).thenReturn(channel)
 
@@ -197,7 +197,7 @@ public class CoreCommandParserTest {
     }
 
     public test fun testPrivmsgToServer() {
-        val user = mock(javaClass<User>())
+        val user = mock<User>()
         `when`(userTracker.user("relay")).thenReturn(user)
 
         val message = CommandMessageData(
@@ -211,7 +211,7 @@ public class CoreCommandParserTest {
     }
 
     public test fun testNoticeToChannel() {
-        val (user, channel) = Pair(mock(javaClass<User>()), mock(javaClass<Channel>()))
+        val (user, channel) = Pair(mock<User>(), mock<Channel>())
         `when`(userTracker.user("relay")).thenReturn(user)
         `when`(channelTracker.channel("#relay")).thenReturn(channel)
 
@@ -227,7 +227,7 @@ public class CoreCommandParserTest {
     }
 
     public test fun testNoticeToServer() {
-        val user = mock(javaClass<User>())
+        val user = mock<User>()
         `when`(userTracker.user("relay")).thenReturn(user)
 
         val message = CommandMessageData(

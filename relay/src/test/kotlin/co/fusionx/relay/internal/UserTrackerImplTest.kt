@@ -2,14 +2,14 @@ package co.fusionx.relay.internal
 
 import co.fusionx.relay.Event
 import co.fusionx.relay.User
+import co.fusionx.relay.mock
 import co.fusionx.relay.test.assertThat
-import org.mockito.Mockito.mock
 import rx.subjects.PublishSubject
 import org.junit.Test as test
 
 public class UserTrackerImplTest {
 
-    private val user = mock(javaClass<User>())
+    private val user = mock<User>()
     private val eventStream = PublishSubject.create<Event>()
     private val userNickMap = hashMapOf<String, User>()
 

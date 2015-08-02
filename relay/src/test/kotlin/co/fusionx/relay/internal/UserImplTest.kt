@@ -2,7 +2,6 @@ package co.fusionx.relay.internal
 
 import co.fusionx.relay.*
 import co.fusionx.relay.test.assertThat
-import org.mockito.Mockito.mock
 import rx.observers.TestSubscriber
 import rx.subjects.PublishSubject
 import org.junit.Test as test
@@ -32,14 +31,14 @@ public class UserImplTest {
     }
 
     test fun testChannelJoinCausesAdditionToChannels() {
-        val channel = mock(javaClass<Channel>())
+        val channel = mock<Channel>()
         eventStream.onNext(JoinEvent(channel, user))
 
         assertThat(user.channels).contains(channel)
     }
 
     test fun testChannelPartCausesRemovalFromChannels() {
-        val channel = mock(javaClass<Channel>())
+        val channel = mock<Channel>()
         eventStream.onNext(JoinEvent(channel, user))
         eventStream.onNext(PartEvent(channel, user))
 
@@ -47,8 +46,8 @@ public class UserImplTest {
     }
 
     test fun testQuitCausesRemovalOfAllChannels() {
-        eventStream.onNext(JoinEvent(mock(javaClass<Channel>()), user))
-        eventStream.onNext(JoinEvent(mock(javaClass<Channel>()), user))
+        eventStream.onNext(JoinEvent(mock<Channel>(), user))
+        eventStream.onNext(JoinEvent(mock<Channel>(), user))
         eventStream.onNext(QuitEvent(user))
 
         assertThat(user.channels).isEmpty()

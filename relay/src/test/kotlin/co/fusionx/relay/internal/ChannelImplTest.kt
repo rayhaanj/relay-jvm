@@ -25,7 +25,7 @@ public class ChannelImplTest {
     }
 
     public test fun testJoinAddsToMap() {
-        val user = mock(javaClass<User>())
+        val user = mock<User>()
         eventSource.onNext(JoinEvent(channel, user))
 
         val map = channel.users
@@ -36,9 +36,9 @@ public class ChannelImplTest {
     }
 
     public test fun testNamesUpdatesMap() {
-        val first = LevelledUser(listOf(UserLevel.OP), mock(javaClass<User>()))
-        val second = LevelledUser(listOf(UserLevel.HALFOP), mock(javaClass<User>()))
-        val third = LevelledUser(listOf(), mock(javaClass<User>()))
+        val first = LevelledUser(listOf(UserLevel.OP), mock<User>())
+        val second = LevelledUser(listOf(UserLevel.HALFOP), mock<User>())
+        val third = LevelledUser(listOf(), mock<User>())
 
         eventSource.onNext(ChannelNamesReplyEvent(channel, listOf(first, second, third)))
 

@@ -6,9 +6,9 @@ import co.fusionx.irc.message.CommandMessage
 import co.fusionx.irc.message.CommandMessageData
 import co.fusionx.relay.internal.parser.ext.CodeExtParser
 import co.fusionx.relay.internal.parser.ext.CommandExtParser
+import co.fusionx.relay.mock
 import co.fusionx.relay.uninitialized
 import org.mockito.Mockito.`when`
-import org.mockito.Mockito.mock
 import org.mockito.Mockito.never
 import org.mockito.Mockito.verify
 import rx.Observable
@@ -20,10 +20,10 @@ public class DelegatingEventParserTest {
 
     private val randomArgs = listOf("random argument")
 
-    private val coreCommand = mock(javaClass<EventParser<CommandMessage>>())
-    private val coreCode = mock(javaClass<EventParser<CodeMessage>>())
-    private val extCommand = mock(javaClass<CommandExtParser>())
-    private val extCode = mock(javaClass<CodeExtParser>())
+    private val coreCommand = mock<EventParser<CommandMessage>>()
+    private val coreCode = mock<EventParser<CodeMessage>>()
+    private val extCommand = mock<CommandExtParser>()
+    private val extCode = mock<CodeExtParser>()
 
     test fun testCodeMessageDelegates() {
         val parser = DelegatingEventParser(coreCommand, coreCode, Observable.empty(), Observable.empty())
