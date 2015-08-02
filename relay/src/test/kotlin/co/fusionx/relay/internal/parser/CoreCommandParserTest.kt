@@ -4,7 +4,7 @@ import co.fusionx.irc.Prefix
 import co.fusionx.irc.message.CommandMessageData
 import co.fusionx.irc.message.Message
 import co.fusionx.relay.*
-import org.mockito.Mockito.`when`
+import org.mockito.Mockito.on
 import org.mockito.Mockito.mock
 import rx.observers.TestSubscriber
 import rx.subjects.PublishSubject
@@ -50,9 +50,9 @@ public class CoreCommandParserTest {
 
     public test fun testSelfJoin() {
         val (self, channel) = Pair(mock<User>(), mock<Channel>())
-        `when`(userTracker.self).thenReturn(self)
-        `when`(userTracker.user("relay")).thenReturn(self)
-        `when`(atomCreationHooks.channel("#relay", eventSource, outputSink, mainExecutor)).thenReturn(channel)
+        on(userTracker.self).thenReturn(self)
+        on(userTracker.user("relay")).thenReturn(self)
+        on(atomCreationHooks.channel("#relay", eventSource, outputSink, mainExecutor)).thenReturn(channel)
 
         val message = CommandMessageData(
             prefix = Prefix("relay"),
@@ -66,8 +66,8 @@ public class CoreCommandParserTest {
 
     public test fun testOtherNewUserJoin() {
         val (other, channel) = Pair(mock<User>(), mock<Channel>())
-        `when`(atomCreationHooks.user("relay", eventSource)).thenReturn(other)
-        `when`(channelTracker.channel("#relay")).thenReturn(channel)
+        on(atomCreationHooks.user("relay", eventSource)).thenReturn(other)
+        on(channelTracker.channel("#relay")).thenReturn(channel)
 
         val message = CommandMessageData(
             prefix = Prefix("relay"),
@@ -81,8 +81,8 @@ public class CoreCommandParserTest {
 
     public test fun testOtherOldUserJoin() {
         val (other, channel) = Pair(mock<User>(), mock<Channel>())
-        `when`(userTracker.user("relay")).thenReturn(other)
-        `when`(channelTracker.channel("#relay")).thenReturn(channel)
+        on(userTracker.user("relay")).thenReturn(other)
+        on(channelTracker.channel("#relay")).thenReturn(channel)
 
         val message = CommandMessageData(
             prefix = Prefix("relay"),
@@ -96,8 +96,8 @@ public class CoreCommandParserTest {
 
     public test fun testNick() {
         val (user, channel) = Pair(mock<User>(), mock<Channel>())
-        `when`(userTracker.user("relay")).thenReturn(user)
-        `when`(user.channels).thenReturn(setOf(channel))
+        on(userTracker.user("relay")).thenReturn(user)
+        on(user.channels).thenReturn(setOf(channel))
 
         val message = CommandMessageData(
             prefix = Prefix("relay"),
@@ -122,8 +122,8 @@ public class CoreCommandParserTest {
 
     public test fun testQuitWithReason() {
         val (user, channel) = Pair(mock<User>(), mock<Channel>())
-        `when`(userTracker.user("relay")).thenReturn(user)
-        `when`(user.channels).thenReturn(setOf(channel))
+        on(userTracker.user("relay")).thenReturn(user)
+        on(user.channels).thenReturn(setOf(channel))
 
         val message = CommandMessageData(
             prefix = Prefix("relay"),
@@ -138,8 +138,8 @@ public class CoreCommandParserTest {
 
     public test fun testQuitWithoutReason() {
         val (user, channel) = Pair(mock<User>(), mock<Channel>())
-        `when`(userTracker.user("relay")).thenReturn(user)
-        `when`(user.channels).thenReturn(setOf(channel))
+        on(userTracker.user("relay")).thenReturn(user)
+        on(user.channels).thenReturn(setOf(channel))
 
         val message = CommandMessageData(
             prefix = Prefix("relay"),
@@ -153,8 +153,8 @@ public class CoreCommandParserTest {
 
     public test fun testPartWithReason() {
         val (user, channel) = Pair(mock<User>(), mock<Channel>())
-        `when`(userTracker.user("relay")).thenReturn(user)
-        `when`(channelTracker.channel("#relay")).thenReturn(channel)
+        on(userTracker.user("relay")).thenReturn(user)
+        on(channelTracker.channel("#relay")).thenReturn(channel)
 
         val message = CommandMessageData(
             prefix = Prefix("relay"),
@@ -168,8 +168,8 @@ public class CoreCommandParserTest {
 
     public test fun testPartWithoutReason() {
         val (user, channel) = Pair(mock<User>(), mock<Channel>())
-        `when`(userTracker.user("relay")).thenReturn(user)
-        `when`(channelTracker.channel("#relay")).thenReturn(channel)
+        on(userTracker.user("relay")).thenReturn(user)
+        on(channelTracker.channel("#relay")).thenReturn(channel)
 
         val message = CommandMessageData(
             prefix = Prefix("relay"),
@@ -183,8 +183,8 @@ public class CoreCommandParserTest {
 
     public test fun testPrivmsgToChannel() {
         val (user, channel) = Pair(mock<User>(), mock<Channel>())
-        `when`(userTracker.user("relay")).thenReturn(user)
-        `when`(channelTracker.channel("#relay")).thenReturn(channel)
+        on(userTracker.user("relay")).thenReturn(user)
+        on(channelTracker.channel("#relay")).thenReturn(channel)
 
         val message = CommandMessageData(
             prefix = Prefix("relay"),
@@ -198,7 +198,7 @@ public class CoreCommandParserTest {
 
     public test fun testPrivmsgToServer() {
         val user = mock<User>()
-        `when`(userTracker.user("relay")).thenReturn(user)
+        on(userTracker.user("relay")).thenReturn(user)
 
         val message = CommandMessageData(
             prefix = Prefix("relay"),
@@ -212,8 +212,8 @@ public class CoreCommandParserTest {
 
     public test fun testNoticeToChannel() {
         val (user, channel) = Pair(mock<User>(), mock<Channel>())
-        `when`(userTracker.user("relay")).thenReturn(user)
-        `when`(channelTracker.channel("#relay")).thenReturn(channel)
+        on(userTracker.user("relay")).thenReturn(user)
+        on(channelTracker.channel("#relay")).thenReturn(channel)
 
         val message = CommandMessageData(
             prefix = Prefix("relay"),
@@ -228,7 +228,7 @@ public class CoreCommandParserTest {
 
     public test fun testNoticeToServer() {
         val user = mock<User>()
-        `when`(userTracker.user("relay")).thenReturn(user)
+        on(userTracker.user("relay")).thenReturn(user)
 
         val message = CommandMessageData(
             prefix = Prefix("relay"),

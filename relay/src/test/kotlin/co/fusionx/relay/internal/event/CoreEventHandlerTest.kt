@@ -3,7 +3,6 @@ package co.fusionx.relay.internal.event
 import co.fusionx.irc.message.ClientMessageGenerator
 import co.fusionx.irc.message.Message
 import co.fusionx.relay.*
-import org.mockito.Mockito.*
 import rx.observers.TestSubscriber
 import rx.subjects.PublishSubject
 import org.junit.Test as test
@@ -30,9 +29,9 @@ public class CoreEventHandlerTest {
     }
 
     public test fun testStatusSocketConnectResponse() {
-        `when`(userConfiguration.nick).thenReturn("relay")
-        `when`(userConfiguration.realName).thenReturn("relay-realname")
-        `when`(userConfiguration.username).thenReturn("relay-username")
+        on(userConfiguration.nick).thenReturn("relay")
+        on(userConfiguration.realName).thenReturn("relay-realname")
+        on(userConfiguration.username).thenReturn("relay-username")
 
         outputSink.subscribe(messageSubscriber)
         eventSource.onNext(StatusEvent(Status.SOCKET_CONNECTED))

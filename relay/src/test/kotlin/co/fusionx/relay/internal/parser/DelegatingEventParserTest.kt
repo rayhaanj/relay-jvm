@@ -8,7 +8,7 @@ import co.fusionx.relay.internal.parser.ext.CodeExtParser
 import co.fusionx.relay.internal.parser.ext.CommandExtParser
 import co.fusionx.relay.mock
 import co.fusionx.relay.uninitialized
-import org.mockito.Mockito.`when`
+import org.mockito.Mockito.on
 import org.mockito.Mockito.never
 import org.mockito.Mockito.verify
 import rx.Observable
@@ -45,7 +45,7 @@ public class DelegatingEventParserTest {
 
     test fun testExtensionCommandMessageDelegates() {
         val message = CommandMessageData(command = "TESTCOMMAND", arguments = randomArgs)
-        `when`(extCommand.canParse(message)).thenReturn(true)
+        on(extCommand.canParse(message)).thenReturn(true)
 
         val parser = DelegatingEventParser(coreCommand, coreCode, Observable.just(extCommand), Observable.empty())
         parser.parse(message).subscribe(TestSubscriber())
@@ -56,7 +56,7 @@ public class DelegatingEventParserTest {
 
     test fun testNotExtensionCommandDelegatesToCore() {
         val message = CommandMessageData(command = "ANOTHERCOMMAND", arguments = randomArgs)
-        `when`(extCommand.canParse(message)).thenReturn(false)
+        on(extCommand.canParse(message)).thenReturn(false)
 
         val parser = DelegatingEventParser(coreCommand, coreCode, Observable.just(extCommand), Observable.empty())
         parser.parse(message).subscribe(TestSubscriber())

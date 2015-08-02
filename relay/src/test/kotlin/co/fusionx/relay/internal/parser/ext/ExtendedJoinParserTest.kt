@@ -5,7 +5,7 @@ import co.fusionx.irc.message.CommandMessageData
 import co.fusionx.irc.message.Message
 import co.fusionx.relay.*
 import org.junit.Test
-import org.mockito.Mockito.`when`
+import org.mockito.Mockito.on
 import org.mockito.Mockito.mock
 import rx.observers.TestSubscriber
 import rx.subjects.PublishSubject
@@ -36,9 +36,9 @@ public class ExtendedJoinParserTest {
 
     public Test fun testSelfJoin() {
         val (self, channel) = Pair(mock<User>(), mock<Channel>())
-        `when`(userTracker.self).thenReturn(self)
-        `when`(userTracker.user("relay")).thenReturn(self)
-        `when`(atomCreationHooks.channel("#relay", eventSource, outputSink, mainExecutor)).thenReturn(channel)
+        on(userTracker.self).thenReturn(self)
+        on(userTracker.user("relay")).thenReturn(self)
+        on(atomCreationHooks.channel("#relay", eventSource, outputSink, mainExecutor)).thenReturn(channel)
 
         val message = CommandMessageData(
             prefix = Prefix("relay"),
@@ -52,8 +52,8 @@ public class ExtendedJoinParserTest {
 
     public Test fun testOtherNewUserJoin() {
         val (other, channel) = Pair(mock<User>(), mock<Channel>())
-        `when`(atomCreationHooks.user("relay", eventSource)).thenReturn(other)
-        `when`(channelTracker.channel("#relay")).thenReturn(channel)
+        on(atomCreationHooks.user("relay", eventSource)).thenReturn(other)
+        on(channelTracker.channel("#relay")).thenReturn(channel)
 
         val message = CommandMessageData(
             prefix = Prefix("relay"),
@@ -67,8 +67,8 @@ public class ExtendedJoinParserTest {
 
     public Test fun testOtherOldUserJoin() {
         val (other, channel) = Pair(mock<User>(), mock<Channel>())
-        `when`(userTracker.user("relay")).thenReturn(other)
-        `when`(channelTracker.channel("#relay")).thenReturn(channel)
+        on(userTracker.user("relay")).thenReturn(other)
+        on(channelTracker.channel("#relay")).thenReturn(channel)
 
         val message = CommandMessageData(
             prefix = Prefix("relay"),

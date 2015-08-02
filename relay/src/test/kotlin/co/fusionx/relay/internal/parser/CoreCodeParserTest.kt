@@ -3,7 +3,7 @@ package co.fusionx.relay.internal.parser
 import co.fusionx.irc.message.CodeMessageData
 import co.fusionx.relay.*
 import co.fusionx.relay.internal.protocol.ReplyCodes
-import org.mockito.Mockito.`when`
+import org.mockito.Mockito.on
 import rx.Observable
 import rx.observers.TestSubscriber
 import rx.subjects.PublishSubject
@@ -28,8 +28,8 @@ public class CoreCodeParserTest {
 
     public test fun testWelcome() {
         val user = mock<User>()
-        `when`(userTracker.self).thenReturn(user)
-        `when`(userTracker.self.nick).thenReturn(Observable.just("*"))
+        on(userTracker.self).thenReturn(user)
+        on(userTracker.self.nick).thenReturn(Observable.just("*"))
 
         val message = CodeMessageData(
             code = ReplyCodes.RPL_WELCOME,
@@ -60,9 +60,9 @@ public class CoreCodeParserTest {
 
     public test fun test2812Names() {
         val (voice, op, channel) = Triple(mock<User>(), mock<User>(), mock<Channel>())
-        `when`(userTracker.user("relay-voice")).thenReturn(voice)
-        `when`(atomCreationHooks.user("relay-op", eventSource)).thenReturn(op)
-        `when`(channelTracker.channel("#relay")).thenReturn(channel)
+        on(userTracker.user("relay-voice")).thenReturn(voice)
+        on(atomCreationHooks.user("relay-op", eventSource)).thenReturn(op)
+        on(channelTracker.channel("#relay")).thenReturn(channel)
 
         val message = CodeMessageData(
             code = ReplyCodes.RPL_NAMES,
