@@ -5,8 +5,6 @@ import co.fusionx.irc.message.CommandMessageData
 import co.fusionx.irc.message.Message
 import co.fusionx.relay.*
 import org.junit.Test
-import org.mockito.Mockito.on
-import org.mockito.Mockito.mock
 import rx.observers.TestSubscriber
 import rx.subjects.PublishSubject
 import java.util.concurrent.ExecutorService

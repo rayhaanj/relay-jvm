@@ -7,8 +7,8 @@ import co.fusionx.irc.message.CommandMessageData
 import co.fusionx.relay.internal.parser.ext.CodeExtParser
 import co.fusionx.relay.internal.parser.ext.CommandExtParser
 import co.fusionx.relay.mock
+import co.fusionx.relay.on
 import co.fusionx.relay.uninitialized
-import org.mockito.Mockito.on
 import org.mockito.Mockito.never
 import org.mockito.Mockito.verify
 import rx.Observable

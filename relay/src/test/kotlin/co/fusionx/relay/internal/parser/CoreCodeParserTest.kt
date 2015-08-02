@@ -3,7 +3,6 @@ package co.fusionx.relay.internal.parser
 import co.fusionx.irc.message.CodeMessageData
 import co.fusionx.relay.*
 import co.fusionx.relay.internal.protocol.ReplyCodes
-import org.mockito.Mockito.on
 import rx.Observable
 import rx.observers.TestSubscriber
 import rx.subjects.PublishSubject
