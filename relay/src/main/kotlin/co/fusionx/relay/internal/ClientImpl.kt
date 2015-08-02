@@ -33,7 +33,11 @@ public class ClientImpl(private val hooks: Hooks,
     companion object {
         fun start(hooks: Hooks,
                   connectionConfig: ConnectionConfiguration,
-                  userConfig: UserConfiguration): Client = ClientImpl(hooks, connectionConfig, userConfig)
+                  userConfig: UserConfiguration): Client {
+            val client = ClientImpl(hooks, connectionConfig, userConfig)
+            client.start()
+            return client
+        }
     }
 
     init {
@@ -67,7 +71,9 @@ public class ClientImpl(private val hooks: Hooks,
 
         val coreHandler = eventHandlers(userConfiguration, session)
         coreHandler.subscribe { it.handle(eventSource, messageSink) }
+    }
 
+    private fun start() {
         sturdyConnection.start()
     }
 
